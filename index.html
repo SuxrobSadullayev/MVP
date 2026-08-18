@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3DS Home Platform — 360° Virtual Tour & Real Estate Marketplace</title>
+  <meta name="description" content="O'zbekistondagi eng ilg'or 3D va 360° virtual turlarga ega ko'chmas mulk platformasi. Uylarni 360 darajaga ko'ring, xaritada joylashuvi va yaqin infratuzilmalarni hisoblang.">
+  
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Leaflet Maps CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Three.js 3D Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Leaflet Maps JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="src/style.css">
+</head>
+<body class="dark-theme">
+  <!-- APP HEADER -->
+  <header class="app-header" id="appHeader">
+    <div class="header-container">
+      <div class="brand-logo" onclick="App.navigateTo('catalog')">
+        <div class="logo-icon"><i class="fa-solid fa-cube"></i></div>
+        <div class="logo-text">
+          <span class="brand-name">3DS <span class="accent-text">HOME</span></span>
+          <span class="brand-tag">360° Real Estate</span>
+        </div>
+      </div>
+
+      <nav class="main-nav">
+        <button class="nav-btn active" onclick="App.navigateTo('catalog')">
+          <i class="fa-solid fa-compass"></i> Catalog
+        </button>
+        <button class="nav-btn" onclick="App.navigateTo('map')">
+          <i class="fa-solid fa-map-location-dot"></i> Xarita
+        </button>
+        <button class="nav-btn" id="navPostBtn" onclick="App.openPostModal()">
+          <i class="fa-solid fa-plus-circle"></i> E'lon Berish
+        </button>
+      </nav>
+
+      <div class="header-actions">
+        <!-- Favorites Badge -->
+        <button class="icon-btn" onclick="App.openFavorites()" title="Saqlanganlar">
+          <i class="fa-regular fa-bookmark"></i>
+          <span class="badge" id="favBadge">0</span>
+        </button>
+
+        <!-- Chat Badge -->
+        <button class="icon-btn" id="chatHeaderBtn" onclick="App.openChatModal()" title="Suhbatlar">
+          <i class="fa-regular fa-comments"></i>
+          <span class="badge" id="chatBadge">0</span>
+        </button>
+
+        <!-- User Wallet Badge -->
+        <button class="wallet-btn" onclick="App.openWalletModal()" id="walletHeaderBtn">
+          <i class="fa-solid fa-wallet"></i>
+          <span id="walletHeaderBalance">0 UZS</span>
+        </button>
+
+        <!-- Auth User Menu -->
+        <div class="user-menu-container" id="userMenuContainer">
+          <!-- Auth buttons or Avatar inserted by JS -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="main-content" id="mainContent">
+    <!-- Dynamic views will render here (Home, Catalog, Map View, Listing Detail, Admin Panel) -->
+  </main>
+
+  <!-- APP FOOTER -->
+  <footer class="app-footer" style="border-top: 1px solid var(--glass-border); padding: 40px 0; background: var(--bg-surface); margin-top: 60px;">
+    <div style="max-width: 1400px; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 40px;">
+      <div>
+        <div class="brand-logo" style="margin-bottom: 12px;">
+          <div class="logo-icon"><i class="fa-solid fa-cube"></i></div>
+          <span class="brand-name">3DS <span class="accent-text">HOME</span></span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 13px; max-width: 320px;">O'zbekistondagi eng birinchi 3D & 360° Virtual Tour formatidagi ko'chmas mulk va uylar bozori platformasi.</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom: 14px; font-size: 15px;">Platforma</h4>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+          <a href="#" onclick="App.navigateTo('catalog')">Uylar Katalogi</a>
+          <a href="#" onclick="App.navigateTo('map')">Interaktiv Xarita</a>
+          <a href="#" onclick="App.openPostModal()">E'lon Qo'shish</a>
+        </div>
+      </div>
+      <div>
+        <h4 style="margin-bottom: 14px; font-size: 15px;">Rollar</h4>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+          <a href="#" onclick="App.openProfileMenu()">Rolni Almashtirish</a>
+          <a href="#" onclick="App.navigateTo('admin')">Super Admin Portal</a>
+        </div>
+      </div>
+      <div>
+        <h4 style="margin-bottom: 14px; font-size: 15px;">Xavfsiz To'lovlar</h4>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+          <span class="tag-badge tag-360"><i class="fa-solid fa-credit-card"></i> HUMO</span>
+          <span class="tag-badge tag-vip"><i class="fa-solid fa-credit-card"></i> UZCARD</span>
+          <span class="tag-badge tag-verified"><i class="fa-brands fa-cc-visa"></i> VISA</span>
+        </div>
+        <p style="font-size: 11px; color: var(--text-muted);">© 2026 3DS Home Platform MVP. Barcha huquqlar himoyalangan.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODALS CONTAINER -->
+  <div id="modalContainer"></div>
+
+  <!-- App Scripts -->
+  <script src="src/js/store.js"></script>
+  <script src="src/js/tour360.js"></script>
+  <script src="src/js/map_engine.js"></script>
+  <script src="src/js/app.js"></script>
+</body>
+</html>
