@@ -1,0 +1,414 @@
+/* ==========================================================================
+   3DS HOME PLATFORM — DESIGN TOKENS
+   --------------------------------------------------------------------------
+   Uch qatlamli arxitektura:
+     1. PRIMITIV  (--p-*)      xom qiymatlar. Komponentda TO'G'RIDAN ISHLATILMAYDI.
+     2. SEMANTIK  (--color-*)  rolga bog'langan. Mavzu bilan almashadi.
+     3. KOMPONENT (--btn-*)    faqat zarurat bo'lganda.
+
+   Barcha rang juftliklari WCAG 2.1 AA bo'yicha O'LCHANGAN (taxmin emas).
+   O'lchov natijalari: docs/DESIGN_SYSTEM.md §3.4
+   ========================================================================== */
+
+/* ==========================================================================
+   1-QATLAM — PRIMITIVLAR
+   ========================================================================== */
+
+:root {
+  /* --- Neytral (asosiy ish oti) ------------------------------------------ */
+  --p-slate-0:    #FFFFFF;
+  --p-slate-50:   #F8FAFC;
+  --p-slate-100:  #F1F5F9;
+  --p-slate-200:  #E2E8F0;
+  --p-slate-300:  #CBD5E1;
+  --p-slate-400:  #94A3B8;
+  --p-slate-450:  #7A899C;  /* interaktiv chegara — light (3.57:1 ✅) */
+  --p-slate-500:  #64748B;
+  --p-slate-550:  #576476;  /* xira matn — light. slate-500 sunken fonda 4.34 ❌ */
+  --p-slate-600:  #475569;
+  --p-slate-700:  #334155;
+  --p-slate-800:  #1E293B;
+  --p-slate-900:  #0F172A;
+  --p-slate-950:  #020617;
+
+  /* --- Brend (3D / texnologiya) ------------------------------------------ */
+  --p-brand-50:   #ECFEFF;
+  --p-brand-100:  #CFFAFE;
+  --p-brand-200:  #A5F3FC;
+  --p-brand-300:  #67E8F9;
+  --p-brand-400:  #22D3EE;
+  --p-brand-500:  #06B6D4;
+  --p-brand-600:  #0891B2;  /* focus ring — light (3.68:1 ✅) */
+  --p-brand-700:  #0E7490;  /* tugma foni — light (oq matn 5.36:1 ✅) */
+  --p-brand-800:  #155E75;
+  --p-brand-900:  #164E63;
+  --p-brand-950:  #083344;
+
+  /* --- VIP / premium ----------------------------------------------------- */
+  --p-gold-100:   #FEF3C7;
+  --p-gold-300:   #FCD34D;
+  --p-gold-400:   #FBBF24;
+  --p-gold-500:   #F59E0B;
+  --p-gold-700:   #B45309;
+  --p-gold-800:   #854D0E;  /* light matn. gold-700 tint fonda 4.51 — juda tor */
+  --p-gold-900:   #78350F;
+
+  /* --- Muvaffaqiyat / tasdiqlangan --------------------------------------- */
+  --p-green-100:  #D1FAE5;
+  --p-green-400:  #34D399;
+  --p-green-500:  #10B981;
+  --p-green-700:  #047857;
+  --p-green-800:  #065F46;  /* light matn. green-700 tint fonda 4.84 — tor */
+  --p-green-900:  #064E3B;
+
+  /* --- Xato / xavf ------------------------------------------------------- */
+  --p-red-100:    #FFE4E6;
+  --p-red-300:    #FDA4AF;  /* dark badge matni. red-400 red-900 fonda 3.55 ❌ */
+  --p-red-400:    #FB7185;
+  --p-red-500:    #F43F5E;
+  --p-red-600:    #E11D48;  /* ⛔ MATN UCHUN ISHLATILMAYDI — canvas'da 4.49 ❌ */
+  --p-red-700:    #BE123C;  /* light matn (canvas 6.01 ✅, tint 5.24 ✅) */
+  --p-red-900:    #881337;
+
+  /* --- Ogohlantirish ----------------------------------------------------- */
+  --p-amber-100:  #FEF3C7;
+  --p-amber-400:  #FBBF24;
+  --p-amber-800:  #854D0E;
+
+  /* ======================================================================
+     TIPOGRAFIYA
+     Yagona oila: Inter Variable.
+     Sabab: uz-Latn + uz-Cyrl + ru to'liq qamrovi (RU — MVP talabi, QAROR-5),
+     bitta variable fayl = kam trafik, kichik o'lchamda eng yaxshi o'qiluvchanlik.
+     ⚠️ Prototipdagi Outfit RAD ETILDI — kirill alifbosini qo'llamaydi.
+     ====================================================================== */
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, monospace;
+
+  /* Shkala — minor third (1.200). Body min 16px (persona: Rustam aka, 56 yosh) */
+  --text-xs:    0.750rem;  /* 12px — faqat caption/meta */
+  --text-sm:    0.875rem;  /* 14px */
+  --text-base:  1.000rem;  /* 16px — body minimum */
+  --text-lg:    1.125rem;  /* 18px */
+  --text-xl:    1.250rem;  /* 20px */
+  --text-2xl:   1.500rem;  /* 24px — sarlavha minimum */
+  --text-3xl:   1.875rem;  /* 30px */
+  --text-4xl:   2.250rem;  /* 36px */
+  --text-5xl:   3.000rem;  /* 48px — hero */
+
+  --leading-tight:   1.20;  /* sarlavhalar */
+  --leading-snug:    1.40;
+  --leading-normal:  1.55;  /* body */
+  --leading-relaxed: 1.70;  /* uzun matn */
+
+  --tracking-tight:  -0.02em;  /* katta sarlavhalar */
+  --tracking-normal:  0;
+  --tracking-wide:    0.02em;  /* kichik CAPS teglar */
+
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+  --weight-extra:    800;
+
+  /* ======================================================================
+     SPACING — 8px grid (TZ NFR-UX-03)
+     ====================================================================== */
+  --space-0:   0;
+  --space-1:   0.25rem;  /*  4px */
+  --space-2:   0.5rem;   /*  8px */
+  --space-3:   0.75rem;  /* 12px */
+  --space-4:   1rem;     /* 16px */
+  --space-5:   1.5rem;   /* 24px */
+  --space-6:   2rem;     /* 32px */
+  --space-7:   3rem;     /* 48px */
+  --space-8:   4rem;     /* 64px */
+  --space-9:   6rem;     /* 96px */
+
+  /* ======================================================================
+     RADIUS
+     ====================================================================== */
+  --radius-sm:   0.375rem;  /*  6px — teglar, kichik tugmalar */
+  --radius-md:   0.625rem;  /* 10px — input, tugma */
+  --radius-lg:   0.875rem;  /* 14px — kartochka */
+  --radius-xl:   1.25rem;   /* 20px — modal, katta panel */
+  --radius-full: 9999px;
+
+  /* ======================================================================
+     TOUCH TARGET — TZ NFR-UX-08 (≥ 44px)
+     ====================================================================== */
+  --tap-min: 2.75rem;  /* 44px */
+
+  /* ======================================================================
+     MOTION
+     ====================================================================== */
+  --duration-fast:  120ms;  /* hover, focus */
+  --duration-base:  200ms;  /* ochilish/yopilish */
+  --duration-slow:  320ms;  /* modal, drawer */
+
+  --ease-standard:  cubic-bezier(0.2, 0, 0, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0, 1);
+  --ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+
+  /* ======================================================================
+     Z-INDEX — markazlashgan, "z-index: 9999" urushlari yo'q
+     ====================================================================== */
+  --z-base:     0;
+  --z-sticky:   100;
+  --z-header:   200;
+  --z-dropdown: 300;
+  --z-overlay:  400;
+  --z-modal:    500;
+  --z-toast:    600;
+
+  /* ======================================================================
+     LAYOUT
+     ====================================================================== */
+  --container-max: 87.5rem;  /* 1400px */
+  --header-height: 4rem;     /* 64px */
+}
+
+/* ==========================================================================
+   2-QATLAM — SEMANTIK (LIGHT — sukut bo'yicha)
+   --------------------------------------------------------------------------
+   NEGA LIGHT SUKUT BO'YICHA:
+   Mahsulotning yadrosi — ishonch. Fotosuratlar oq fonda haqiqatga yaqinroq
+   ko'rinadi; qora fon ularni sun'iy ravishda yorqinroq va to'yinganroq
+   ko'rsatadi. Ko'chmas mulk platformasi uchun bu — noto'g'ri va'da.
+   Immersiv sirtlar (360° viewer, xarita) esa HAR DOIM qorong'i — §4.2.
+   ========================================================================== */
+
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* --- Fon qatlamlari ---------------------------------------------------- */
+  --color-bg-canvas:      var(--p-slate-50);   /* sahifa foni */
+  --color-bg-surface:     var(--p-slate-0);    /* kartochka, panel */
+  --color-bg-raised:      var(--p-slate-0);    /* modal, dropdown */
+  --color-bg-sunken:      var(--p-slate-100);  /* input, kod bloki */
+  --color-bg-hover:       var(--p-slate-100);
+  --color-bg-active:      var(--p-slate-200);
+  --color-bg-disabled:    var(--p-slate-100);
+
+  /* --- Matn -------------------------------------------------------------- */
+  /* Koeffitsientlar ENG YOMON fonga nisbatan: canvas (slate-50) va sunken (slate-100).
+     ⚠️ #FFFFFF ga nisbatan tekshirish — xato. Haqiqiy sahifa foni oq emas. */
+  --color-text-primary:   var(--p-slate-900);  /* 17.06 ✅ AAA */
+  --color-text-secondary: var(--p-slate-600);  /*  7.24 ✅ AAA */
+  --color-text-muted:     var(--p-slate-550);  /*  5.49 ✅ — ENG PAST RUXSAT */
+  --color-text-disabled:  var(--p-slate-400);  /*  2.56 — WCAG 1.4.3 disabled'ni istisno qiladi.
+                                                  BU XATO EMAS, tuzatmang. */
+  --color-text-inverse:   var(--p-slate-0);
+  --color-text-brand:     var(--p-brand-700);  /*  5.12 ✅ */
+
+  /* --- Chegaralar --------------------------------------------------------
+     divider  = dekorativ, WCAG talabi YO'Q
+     control  = interaktiv element chegarasi, WCAG 1.4.11 ≥ 3:1 MAJBURIY   */
+  --color-border-divider: var(--p-slate-200);
+  --color-border-control: var(--p-slate-450);  /* 3.57:1 ✅ */
+  --color-border-strong:  var(--p-slate-600);
+
+  /* --- Brend / harakat ---------------------------------------------------- */
+  --color-action-bg:        var(--p-brand-700);  /* oq matn 5.36:1 ✅ */
+  --color-action-bg-hover:  var(--p-brand-800);
+  --color-action-bg-active: var(--p-brand-900);
+  --color-action-text:      var(--p-slate-0);
+  --color-action-subtle-bg: var(--p-brand-50);
+  --color-action-subtle-text: var(--p-brand-800);
+
+  /* --- Focus (WCAG 2.4.7 + 1.4.11) --------------------------------------- */
+  --color-focus-ring:   var(--p-brand-600);  /* 3.68:1 ✅ */
+  --color-focus-offset: var(--p-slate-0);
+
+  /* --- Status ------------------------------------------------------------ */
+  /* Status matni O'Z tint fonida HAM, canvas'da HAM ishlashi shart —
+     shuning uchun 800/700 daraja, 600 emas. */
+  --color-success-text: var(--p-green-800);  /* tint 6.78 ✅ */
+  --color-success-bg:   var(--p-green-100);
+  --color-success-icon: var(--p-green-500);
+
+  --color-danger-text:  var(--p-red-700);    /* tint 5.24 ✅ · canvas 6.01 ✅ */
+  --color-danger-bg:    var(--p-red-100);
+  --color-danger-icon:  var(--p-red-500);
+
+  --color-warning-text: var(--p-amber-800);  /* tint 6.15 ✅ */
+  --color-warning-bg:   var(--p-amber-100);
+  --color-warning-icon: var(--p-amber-400);
+
+  /* --- ISHONCH TOKENLARI --------------------------------------------------
+     Mahsulotning farqlovchi g'oyasi vizual tilga aylantirilgan.
+     "Tizim hisobladi" va "sotuvchi da'vo qildi" — ko'rinishda AJRALIB
+     turishi SHART. Bu — dekorativ emas, mahsulot talabi.                   */
+  --color-trust-computed-text: var(--p-brand-800);  /* tizim hisoblagan */
+  --color-trust-computed-bg:   var(--p-brand-50);
+  --color-trust-claimed-text:  var(--p-slate-600);  /* sotuvchi kiritgan */
+  --color-trust-claimed-bg:    var(--p-slate-100);
+
+  --color-vip-text: var(--p-gold-800);   /* tint 6.15 ✅ */
+  --color-vip-bg:   var(--p-gold-100);
+  --color-vip-icon: var(--p-gold-500);
+
+  --color-verified-text: var(--p-green-800);  /* tint 6.78 ✅ */
+  --color-verified-bg:   var(--p-green-100);
+
+  /* --- Elevation ----------------------------------------------------------
+     LIGHT: soya bilan. DARK: soya o'rniga sirt yorqinlashadi (§4.3)        */
+  --shadow-sm:    0 1px 2px 0 rgb(15 23 42 / 0.05);
+  --shadow-md:    0 2px 4px -1px rgb(15 23 42 / 0.07), 0 4px 12px -2px rgb(15 23 42 / 0.08);
+  --shadow-lg:    0 4px 8px -2px rgb(15 23 42 / 0.08), 0 12px 28px -4px rgb(15 23 42 / 0.12);
+  --shadow-modal: 0 8px 16px -4px rgb(15 23 42 / 0.10), 0 24px 56px -8px rgb(15 23 42 / 0.20);
+}
+
+/* ==========================================================================
+   2-QATLAM — SEMANTIK (DARK)
+   ========================================================================== */
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-bg-canvas:      var(--p-slate-950);
+  --color-bg-surface:     var(--p-slate-900);
+  --color-bg-raised:      var(--p-slate-800);
+  --color-bg-sunken:      var(--p-slate-950);
+  --color-bg-hover:       var(--p-slate-800);
+  --color-bg-active:      var(--p-slate-700);
+  --color-bg-disabled:    var(--p-slate-800);
+
+  --color-text-primary:   var(--p-slate-100);  /* 16.30:1 AAA */
+  --color-text-secondary: var(--p-slate-300);  /* 12.02:1 AAA */
+  --color-text-muted:     var(--p-slate-400);  /*  6.96:1 AA  — ENG PAST RUXSAT
+                                                  ⚠️ slate-500 DARK'da 3.75:1 — YAROQSIZ */
+  --color-text-disabled:  var(--p-slate-600);
+  --color-text-inverse:   var(--p-slate-900);
+  --color-text-brand:     var(--p-brand-400);  /*  9.88:1 AAA */
+
+  --color-border-divider: var(--p-slate-800);
+  --color-border-control: var(--p-slate-500);  /* 3.75:1 ✅ */
+  --color-border-strong:  var(--p-slate-400);
+
+  /* DARK'da brend tugmasi teskari: yorqin fon + qorong'i matn (9.88:1 AAA) */
+  --color-action-bg:        var(--p-brand-400);
+  --color-action-bg-hover:  var(--p-brand-300);
+  --color-action-bg-active: var(--p-brand-200);
+  --color-action-text:      var(--p-slate-900);
+  --color-action-subtle-bg: var(--p-brand-950);
+  --color-action-subtle-text: var(--p-brand-300);
+
+  --color-focus-ring:   var(--p-brand-400);  /* 9.88:1 ✅ */
+  --color-focus-offset: var(--p-slate-900);
+
+  --color-success-text: var(--p-green-400);
+  --color-success-bg:   var(--p-green-900);
+  --color-success-icon: var(--p-green-400);
+
+  --color-danger-text:  var(--p-red-300);  /* red-400 red-900 fonda 3.55 ❌ → red-300 5.06 ✅ */
+  --color-danger-bg:    var(--p-red-900);
+  --color-danger-icon:  var(--p-red-400);
+
+  --color-warning-text: var(--p-amber-400);
+  --color-warning-bg:   var(--p-gold-900);
+  --color-warning-icon: var(--p-amber-400);
+
+  --color-trust-computed-text: var(--p-brand-300);
+  --color-trust-computed-bg:   var(--p-brand-950);
+  --color-trust-claimed-text:  var(--p-slate-300);
+  --color-trust-claimed-bg:    var(--p-slate-800);
+
+  --color-vip-text: var(--p-gold-400);  /* 10.69:1 AAA */
+  --color-vip-bg:   var(--p-gold-900);
+  --color-vip-icon: var(--p-gold-400);
+
+  --color-verified-text: var(--p-green-400);
+  --color-verified-bg:   var(--p-green-900);
+
+  /* DARK'da soya ko'rinmaydi — chuqurlik CHEGARA bilan beriladi */
+  --shadow-sm:    0 0 0 1px rgb(148 163 184 / 0.06);
+  --shadow-md:    0 0 0 1px rgb(148 163 184 / 0.08), 0 4px 12px -2px rgb(0 0 0 / 0.40);
+  --shadow-lg:    0 0 0 1px rgb(148 163 184 / 0.10), 0 12px 28px -4px rgb(0 0 0 / 0.50);
+  --shadow-modal: 0 0 0 1px rgb(148 163 184 / 0.12), 0 24px 56px -8px rgb(0 0 0 / 0.65);
+}
+
+/* --------------------------------------------------------------------------
+   Tizim sozlamasiga ergashish — foydalanuvchi aniq tanlamagan bo'lsa
+   -------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --color-bg-canvas:      var(--p-slate-950);
+    --color-bg-surface:     var(--p-slate-900);
+    --color-bg-raised:      var(--p-slate-800);
+    --color-bg-sunken:      var(--p-slate-950);
+    --color-bg-hover:       var(--p-slate-800);
+    --color-bg-active:      var(--p-slate-700);
+    --color-bg-disabled:    var(--p-slate-800);
+
+    --color-text-primary:   var(--p-slate-100);
+    --color-text-secondary: var(--p-slate-300);
+    --color-text-muted:     var(--p-slate-400);
+    --color-text-disabled:  var(--p-slate-600);
+    --color-text-inverse:   var(--p-slate-900);
+    --color-text-brand:     var(--p-brand-400);
+
+    --color-border-divider: var(--p-slate-800);
+    --color-border-control: var(--p-slate-500);
+    --color-border-strong:  var(--p-slate-400);
+
+    --color-action-bg:        var(--p-brand-400);
+    --color-action-bg-hover:  var(--p-brand-300);
+    --color-action-bg-active: var(--p-brand-200);
+    --color-action-text:      var(--p-slate-900);
+    --color-action-subtle-bg: var(--p-brand-950);
+    --color-action-subtle-text: var(--p-brand-300);
+
+    --color-focus-ring:   var(--p-brand-400);
+    --color-focus-offset: var(--p-slate-900);
+
+    --color-success-text: var(--p-green-400);
+    --color-success-bg:   var(--p-green-900);
+    --color-success-icon: var(--p-green-400);
+    --color-danger-text:  var(--p-red-300);  /* red-400 red-900 fonda 3.55 ❌ → red-300 5.06 ✅ */
+    --color-danger-bg:    var(--p-red-900);
+    --color-danger-icon:  var(--p-red-400);
+    --color-warning-text: var(--p-amber-400);
+    --color-warning-bg:   var(--p-gold-900);
+    --color-warning-icon: var(--p-amber-400);
+
+    --color-trust-computed-text: var(--p-brand-300);
+    --color-trust-computed-bg:   var(--p-brand-950);
+    --color-trust-claimed-text:  var(--p-slate-300);
+    --color-trust-claimed-bg:    var(--p-slate-800);
+
+    --color-vip-text: var(--p-gold-400);
+    --color-vip-bg:   var(--p-gold-900);
+    --color-vip-icon: var(--p-gold-400);
+    --color-verified-text: var(--p-green-400);
+    --color-verified-bg:   var(--p-green-900);
+
+    --shadow-sm:    0 0 0 1px rgb(148 163 184 / 0.06);
+    --shadow-md:    0 0 0 1px rgb(148 163 184 / 0.08), 0 4px 12px -2px rgb(0 0 0 / 0.40);
+    --shadow-lg:    0 0 0 1px rgb(148 163 184 / 0.10), 0 12px 28px -4px rgb(0 0 0 / 0.50);
+    --shadow-modal: 0 0 0 1px rgb(148 163 184 / 0.12), 0 24px 56px -8px rgb(0 0 0 / 0.65);
+  }
+}
+
+/* ==========================================================================
+   IMMERSIV SIRT — mavzudan QAT'I NAZAR doim qorong'i
+   360° viewer va xarita: media o'zi kontent, chrome yo'qolishi kerak.
+   ========================================================================== */
+
+.surface-immersive {
+  color-scheme: dark;
+  --color-bg-surface:     var(--p-slate-950);
+  --color-text-primary:   var(--p-slate-100);
+  --color-text-secondary: var(--p-slate-300);
+  --color-text-muted:     var(--p-slate-400);
+  --color-border-divider: rgb(148 163 184 / 0.16);
+  --color-border-control: var(--p-slate-500);
+  --color-focus-ring:     var(--p-brand-400);
+  --color-focus-offset:   var(--p-slate-950);
+
+  background-color: var(--p-slate-950);
+  color: var(--color-text-primary);
+}

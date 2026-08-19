@@ -374,7 +374,14 @@ audit_logs         id, actor_id, action, entity, entity_id,
 | **NFR-UX-03** | 🔴 | **8px grid** tizimi: 4, 8, 12, 16, 24, 32, 48, 64 |
 | **NFR-UX-04** | 🔴 | Maksimum **2 ta shrift oilasi** |
 | **NFR-UX-05** | 🔴 | Har bir komponent uchun **barcha holatlar**: default, hover, focus, active, disabled, loading, error, empty |
-| **NFR-UX-06** | 🟠 | Light va Dark rejim ikkalasi ham |
+| **NFR-UX-06** | 🟠 | Light va Dark rejim ikkalasi ham. **Light — sukut bo'yicha**: fotosurat oq fonda haqiqatga yaqinroq ko'rinadi, bu ishonchga qurilgan mahsulot uchun muhim |
+| **NFR-UX-17** | 🔴 | Kontrast **render qilingan sahifada**, eng yomon haqiqiy fonga nisbatan o'lchanadi va **CI da avtomatlashtiriladi**. Faqat `#FFFFFF` ga nisbatan tekshirish taqiqlanadi — bu 4 ta yiqilishni yashirgan edi (DESIGN_SYSTEM §3.3) |
+| **NFR-UX-18** | 🔴 | Har qanday shrift **kirill alifbosini qo'llashi shart**. Prototipdagi `Outfit` shu sababdan rad etildi; ru — MVP talabi (QAROR-5) |
+| **NFR-UX-19** | 🔴 | Immersiv sirtlar (360° viewer, xarita) mavzudan **qat'i nazar qorong'i** (`.surface-immersive`) — u yerda media o'zi kontent |
+| **NFR-UX-20** | 🔴 | "Tizim hisobladi" va "sotuvchi kiritdi" ma'lumoti **vizual jihatdan ajraladi** (`.data-computed` / `.data-claimed`). Bu — FR-MAP-09 ning ko'rinadigan ifodasi va mahsulotning farqlovchi g'oyasi |
+| **NFR-UX-21** | 🔴 | Ichki standart: matn kontrasti ≥ **5.0** (AA talabi 4.5 + zaxira). 4.51 da turgan tizim birinchi o'zgarishda yiqiladi |
+
+> 📎 To'liq amalga oshirilishi va o'lchov natijalari: [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md)
 
 ### 6.2 Mobil (mobile-first)
 

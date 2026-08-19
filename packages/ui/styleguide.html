@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3DS Home — Dizayn tizimi</title>
+
+<!-- Inter Variable. ⚠️ Faqat styleguide uchun CDN. Production'da self-host (TZ NFR-OPS-05) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="src/tokens.css">
+<link rel="stylesheet" href="src/base.css">
+
+<style>
+  /* Faqat styleguide sahifasi uchun — dizayn tizimiga kirmaydi */
+  body { padding-bottom: var(--space-9); }
+
+  .sg-header {
+    position: sticky; top: 0; z-index: var(--z-header);
+    background: var(--color-bg-surface);
+    border-bottom: 1px solid var(--color-border-divider);
+    padding-block: var(--space-3);
+  }
+  .sg-header .container { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+
+  .sg-section { padding-top: var(--space-7); }
+  .sg-section > h2 {
+    font-size: var(--text-2xl); margin-bottom: var(--space-2);
+    padding-bottom: var(--space-2); border-bottom: 2px solid var(--color-border-divider);
+  }
+  .sg-note {
+    font-size: var(--text-sm); color: var(--color-text-muted);
+    max-width: 68ch; margin-bottom: var(--space-5);
+  }
+  .sg-sub { font-size: var(--text-base); font-weight: var(--weight-semibold);
+            margin-top: var(--space-5); margin-bottom: var(--space-3); color: var(--color-text-secondary); }
+
+  .sg-row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+
+  .sg-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: var(--space-3); }
+  .sg-swatch { border: 1px solid var(--color-border-divider); border-radius: var(--radius-md); overflow: hidden; }
+  .sg-swatch-chip { height: 4rem; }
+  .sg-swatch-meta { padding: var(--space-2); font-size: var(--text-xs); line-height: 1.5; }
+  .sg-swatch-meta code { font-family: var(--font-mono); color: var(--color-text-muted); }
+
+  .sg-pass { color: var(--color-success-text); font-weight: var(--weight-semibold); }
+  .sg-fail { color: var(--color-danger-text);  font-weight: var(--weight-semibold); }
+
+  .sg-scale-row { display: flex; align-items: baseline; gap: var(--space-4); padding: var(--space-2) 0;
+                  border-bottom: 1px solid var(--color-border-divider); }
+  .sg-scale-row code { font-family: var(--font-mono); font-size: var(--text-xs);
+                       color: var(--color-text-muted); min-width: 9rem; }
+
+  .sg-space-bar { background: var(--color-action-bg); height: 1rem; border-radius: 2px; }
+
+  .sg-do-dont { display: grid; gap: var(--space-4); grid-template-columns: 1fr; }
+  @media (min-width: 48rem) { .sg-do-dont { grid-template-columns: 1fr 1fr; } }
+  .sg-do, .sg-dont { padding: var(--space-4); border-radius: var(--radius-md); border: 1px solid; }
+  .sg-do   { border-color: var(--color-success-text); background: var(--color-success-bg); }
+  .sg-dont { border-color: var(--color-danger-text);  background: var(--color-danger-bg); }
+</style>
+</head>
+
+<body>
+<a class="skip-link" href="#main">Asosiy kontentga o'tish</a>
+
+<header class="sg-header">
+  <div class="container">
+    <div>
+      <strong>3DS Home — Dizayn tizimi</strong>
+      <div class="t-caption">v1.0 · tokens.css + base.css</div>
+    </div>
+    <button class="btn btn-secondary btn-sm" id="themeToggle" aria-live="polite">
+      <span id="themeLabel">🌙 Dark</span>
+    </button>
+  </div>
+</header>
+
+<main id="main" class="container">
+
+<!-- ====================================================================== -->
+<section class="sg-section">
+  <h2>1. Dizayn prinsiplari</h2>
+  <p class="sg-note">
+    Har bir vizual qaror shu beshta prinsipdan biriga tayanadi. Tayanmasa — qaror emas, did.
+  </p>
+  <div class="stack" style="gap: var(--space-3)">
+    <div class="card"><div class="card-body">
+      <strong>1. Fotosurat birinchi</strong>
+      <span class="t-small t-secondary">UI chekinadi, mulk surati hukmronlik qiladi. Chrome — ramka, kontent emas.</span>
+    </div></div>
+    <div class="card"><div class="card-body">
+      <strong>2. Ishonch ko'rinadigan bo'lsin</strong>
+      <span class="t-small t-secondary">Tizim hisoblagan ma'lumot va sotuvchi da'vosi <em>vizual jihatdan ajralib turadi</em>. Bu — dekoratsiya emas, mahsulot talabi.</span>
+    </div></div>
+    <div class="card"><div class="card-body">
+      <strong>3. Mobil — asosiy</strong>
+      <span class="t-small t-secondary">Malika (Namangan, faqat telefon) — birlamchi persona. Desktop — kengaytma.</span>
+    </div></div>
+    <div class="card"><div class="card-body">
+      <strong>4. Tez his qilinsin</strong>
+      <span class="t-small t-secondary">Skeleton, optimistik yangilanish, progressiv rasm. Kutish — ko'rinadigan bo'lsin.</span>
+    </div></div>
+    <div class="card"><div class="card-body">
+      <strong>5. Bir marta o'lchangan</strong>
+      <span class="t-small t-secondary">Har bir rang juftligi WCAG bo'yicha hisoblangan. Komponentda xom qiymat yozilmaydi.</span>
+    </div></div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<section class="sg-section">
+  <h2>2. Mavzu strategiyasi</h2>
+  <p class="sg-note">
+    <strong>Light — sukut bo'yicha.</strong> Fotosuratlar oq fonda haqiqatga yaqinroq ko'rinadi;
+    qora fon ularni sun'iy yorqinroq va to'yinganroq ko'rsatadi. Ishonchga qurilgan mahsulot uchun
+    bu noto'g'ri va'da. <strong>Immersiv sirtlar (360° viewer, xarita) — har doim qorong'i</strong>,
+    mavzudan qat'i nazar: u yerda media o'zi kontent.
+  </p>
+  <div class="surface-immersive" style="padding: var(--space-5); border-radius: var(--radius-lg)">
+    <span class="badge badge-tour">360° INTERAKTIV XONA</span>
+    <p style="margin-top: var(--space-3)"><strong>.surface-immersive</strong> — bu blok mavzu almashganda ham qorong'i qoladi.</p>
+    <p class="t-small t-muted">Tugmani bosib tekshiring: yuqoridagi hamma narsa o'zgaradi, bu blok — yo'q.</p>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<section class="sg-section">
+  <h2>3. Rang — o'lchangan, taxmin qilinmagan</h2>
+  <p class="sg-note">
+    Quyidagi koeffitsientlar WCAG 2.1 formulasi bo'yicha <strong>hisoblangan</strong>.
+    Uchta muhim tuzatish shu o'lchov natijasida kiritildi — pastda "Rad etilganlar" bo'limiga qarang.
+  </p>
+
+  <h3 class="sg-sub">Matn (light mavzu, oq fonda)</h3>
+  <div class="sg-swatches">
+    <div class="sg-swatch">
+      <div class="sg-swatch-chip" style="background: var(--p-slate-900)"></div>
+      <div class="sg-swatch-meta"><strong>text-primary</strong><br><code>#0F172A</code><br><span class="sg-pass">17.85:1 AAA</span></div>
+    </div>
+    <div class="sg-swatch">
+      <div class="sg-swatch-chip" style="background: var(--p-slate-600)"></div>
+      <div class="sg-swatch-meta"><strong>text-secondary</strong><br><code>#475569</code><br><span class="sg-pass">7.58:1 AAA</span></div>
+    </div>
+    <div class="sg-swatch">
+      <div class="sg-swatch-chip" style="background: var(--p-slate-500)"></div>
+      <div class="sg-swatch-meta"><strong>text-muted</strong><br><code>#64748B</code><br><span class="sg-pass">4.76:1 AA</span></div>
+    </div>
+    <div class="sg-swatch">
+      <div class="sg-swatch-chip" style="background: var(--p-brand-700)"></div>
+      <div class="sg-swatch-meta"><strong>text-brand</strong><br><code>#0E7490</code><br><span class="sg-pass">5.36:1 AA</span></div>
+    </div>
+  </div>
+
+  <h3 class="sg-sub">Status</h3>
+  <div class="sg-swatches">
+    <div class="sg-swatch">
+      <div class="sg-swatch-chip" style="background: var(--p-green-700)"></div>
+      <div class="sg-swatch-meta"><strong>success</strong><br><code>#047857</code><br><span class="sg-pass">5.48:1 AA</span></div>
+    </div>
+    <div class="sg-swatch">
+      <div class="sg-swatch-chip" style="background: var(--p-red-600)"></div>
+      <div class="sg-swatch-meta"><strong>danger</strong><br><code>#E11D48</code><br><span class="sg-pass">4.70:1 AA</span></div>
+    </div>
+    <div class="sg-swatch">
+      <div class="sg-swatch-chip" style="background: var(--p-gold-700)"></div>
+      <div class="sg-swatch-meta"><strong>vip</strong><br><code>#B45309</code><br><span class="sg-pass">5.02:1 AA</span></div>
+    </div>
+    <div class="sg-swatch">
+      <div class="sg-swatch-chip" style="background: var(--p-slate-450)"></div>
+      <div class="sg-swatch-meta"><strong>border-control</strong><br><code>#7A899C</code><br><span class="sg-pass">3.57:1 ✓ 1.4.11</span></div>
+    </div>
+  </div>
+
+  <h3 class="sg-sub">O'lchov natijasida RAD ETILGANLAR</h3>
+  <div class="sg-do-dont">
+    <div class="sg-dont">
+      <strong>❌ <code>slate-400</code> xira matn sifatida</strong>
+      <p class="t-small" style="margin-top: var(--space-2)">Oq fonda <strong>2.56:1</strong> — AA dan pastda.
+      Ko'p dizayn tizimida uchraydigan klassik xato. Light'da eng past ruxsat — <code>slate-500</code>.</p>
+    </div>
+    <div class="sg-dont">
+      <strong>❌ <code>brand-600</code> asosiy tugma foni</strong>
+      <p class="t-small" style="margin-top: var(--space-2)">Oq matn bilan <strong>3.68:1</strong> — normal matn uchun yetarli emas.
+      Tugma foni <code>brand-700</code> ga ko'chirildi (<strong>5.36:1</strong>). <code>brand-600</code> endi faqat focus halqasi.</p>
+    </div>
+    <div class="sg-dont">
+      <strong>❌ <code>slate-500</code> dark mavzuda xira matn</strong>
+      <p class="t-small" style="margin-top: var(--space-2)">Qorong'i fonda <strong>3.75:1</strong> — yiqiladi.
+      Dark'da eng past ruxsat — <code>slate-400</code> (<strong>6.96:1</strong>). Bir xil token ikki mavzuda ishlamaydi.</p>
+    </div>
+    <div class="sg-dont">
+      <strong>❌ Prototipdagi <code>#00F2FE</code> siyan</strong>
+      <p class="t-small" style="margin-top: var(--space-2)">Oq fonda deyarli o'qilmaydi. Faqat qorong'i fon uchun yaroqli edi —
+      shuning uchun prototip light mavzuni umuman qo'llay olmasdi.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<section class="sg-section">
+  <h2>4. Tipografiya</h2>
+  <p class="sg-note">
+    <strong>Yagona oila — Inter Variable.</strong> Prototipdagi <code>Outfit</code> rad etildi:
+    u kirill alifbosini qo'llamaydi, rus tili esa MVP talabi (QAROR-5). Bitta variable fayl —
+    kam trafik va kichik o'lchamda eng yaxshi o'qiluvchanlik.
+  </p>
+  <div>
+    <div class="sg-scale-row"><code>--text-5xl / 48px</code><span class="t-hero">Uy toping</span></div>
+    <div class="sg-scale-row"><code>--text-2xl / 24px</code><span class="t-title">Tanlangan uylar</span></div>
+    <div class="sg-scale-row"><code>--text-xl / 20px</code><span class="t-heading">Yaqin infratuzilma</span></div>
+    <div class="sg-scale-row"><code>--text-base / 16px</code><span class="t-body">Asosiy matn — minimal ruxsat etilgan o'lcham</span></div>
+    <div class="sg-scale-row"><code>--text-sm / 14px</code><span class="t-small">Ikkilamchi matn</span></div>
+    <div class="sg-scale-row"><code>--text-xs / 12px</code><span class="t-caption">Faqat caption va meta</span></div>
+    <div class="sg-scale-row"><code>.t-price</code><span class="t-price">1 450 000 000 so'm</span></div>
+  </div>
+  <p class="sg-note" style="margin-top: var(--space-4)">
+    Narxlarda <code>font-variant-numeric: tabular-nums</code> — raqamlar ustunda tekis turadi.
+    Katalogda bu sezilarli farq qiladi.
+  </p>
+</section>
+
+<!-- ====================================================================== -->
+<section class="sg-section">
+  <h2>5. Spacing — 8px grid</h2>
+  <div class="stack" style="gap: var(--space-2)">
+    <div class="sg-scale-row"><code>--space-1 / 4px</code>  <div class="sg-space-bar" style="width: 4px"></div></div>
+    <div class="sg-scale-row"><code>--space-2 / 8px</code>  <div class="sg-space-bar" style="width: 8px"></div></div>
+    <div class="sg-scale-row"><code>--space-3 / 12px</code> <div class="sg-space-bar" style="width: 12px"></div></div>
+    <div class="sg-scale-row"><code>--space-4 / 16px</code> <div class="sg-space-bar" style="width: 16px"></div></div>
+    <div class="sg-scale-row"><code>--space-5 / 24px</code> <div class="sg-space-bar" style="width: 24px"></div></div>
+    <div class="sg-scale-row"><code>--space-6 / 32px</code> <div class="sg-space-bar" style="width: 32px"></div></div>
+    <div class="sg-scale-row"><code>--space-7 / 48px</code> <div class="sg-space-bar" style="width: 48px"></div></div>
+    <div class="sg-scale-row"><code>--space-8 / 64px</code> <div class="sg-space-bar" style="width: 64px"></div></div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<section class="sg-section">
+  <h2>6. Tugmalar — 5 ta holat</h2>
+  <p class="sg-note">
+    Har bir variant uchun barcha holat mavjud bo'lishi shart (TZ NFR-UX-05).
+    Balandlik ≥ 44px (NFR-UX-08). Klaviatura bilan o'tib, focus halqasini tekshiring.
+  </p>
+
+  <h3 class="sg-sub">Primary</h3>
+  <div class="sg-row">
+    <button class="btn btn-primary">Default</button>
+    <button class="btn btn-primary" data-loading="true">Loading</button>
+    <button class="btn btn-primary" disabled>Disabled</button>
+    <button class="btn btn-primary btn-sm">Kichik</button>
+    <button class="btn btn-primary btn-lg">Katta</button>
+  </div>
+
+  <h3 class="sg-sub">Secondary / Ghost / Danger</h3>
+  <div class="sg-row">
+    <button class="btn btn-secondary">Secondary</button>
+    <button class="btn btn-secondary" disabled>Disabled</button>
+    <button class="btn btn-ghost">Ghost</button>
+    <button class="btn btn-danger">E'lonni rad etish</button>
+    <button class="btn btn-secondary btn-icon" aria-label="Saqlanganlarga qo'shish">♡</button>
+  </div>
+
+  <div class="sg-do-dont" style="margin-top: var(--space-5)">
+    <div class="sg-do">
+      <strong>✅ To'g'ri CTA</strong>
+      <div style="margin-top: var(--space-3)"><button class="btn btn-primary">E'lonni moderatsiyaga yuborish</button></div>
+      <p class="t-small" style="margin-top: var(--space-2)">Aniq harakat va natija.</p>
+    </div>
+    <div class="sg-dont">
+      <strong>❌ Noto'g'ri CTA</strong>
+      <div style="margin-top: var(--space-3)"><button class="btn btn-secondary">Yuborish</button></div>
+      <p class="t-small" style="margin-top: var(--space-2)">Nima yuboriladi? Qayerga? (TZ NFR-CNT-01)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<section class="sg-section">
+  <h2>7. Forma elementlari — 5 ta holat</h2>
+  <div class="grid-listings" style="align-items: start">
+    <div class="field">
+      <label class="field-label" for="i1">Default</label>
+      <input class="input" id="i1" placeholder="Masalan: Chilonzor tumani">
+      <span class="field-hint">Placeholder misol ko'rsatadi (NFR-CNT-03)</span>
+    </div>
+    <div class="field">
+      <label class="field-label" for="i2">To'ldirilgan</label>
+      <input class="input" id="i2" value="Samarqand, Registon">
+    </div>
+    <div class="field">
+      <label class="field-label" data-required for="i3">Xato</label>
+      <input class="input" id="i3" value="+998 90 12" aria-invalid="true" aria-describedby="e3">
+      <span class="field-error" id="e3" role="alert">⚠ Telefon to'liq emas. Misol: +998 90 123 45 67</span>
+    </div>
+    <div class="field">
+      <label class="field-label" for="i4">O'chirilgan</label>
+      <input class="input" id="i4" value="Tahrirlab bo'lmaydi" disabled>
+    </div>
+  </div>
+  <p class="sg-note" style="margin-top: var(--space-4)">
+    Xato matni texnik emas va <strong>nima qilish kerakligini aytadi</strong> — misol bilan.
+    <code>role="alert"</code> skrinriderga darhol e'lon qiladi.
+  </p>
+</section>
+
+<!-- ====================================================================== -->
+<section class="sg-section">
+  <h2>8. Ishonch tili — mahsulotning yadrosi</h2>
+  <p class="sg-note">
+    Bu bo'lim dizayn tizimini <strong>shu mahsulotga xos</strong> qiladi.
+    Foydalanuvchi bir qarashda ajrata olishi kerak: qaysi raqamni <em>tizim hisobladi</em>,
+    qaysi gapni <em>sotuvchi yozdi</em>.
+  </p>
+  <div class="sg-do-dont">
+    <div class="card"><div class="card-body">
+      <span class="t-label" style="color: var(--color-trust-computed-text)">Tizim hisobladi</span>
+      <div class="poi-row">
+        <div class="poi-name">🏫 <span>Prezident maktabi</span></div>
+        <span class="data-computed">~350 m · 4 daq</span>
+      </div>
+      <div class="poi-row">
+        <div class="poi-name">🛒 <span>Korzinka</span></div>
+        <span class="data-computed">~120 m · 2 daq</span>
+      </div>
+      <p class="t-caption">Sotuvchi bu raqamlarni o'zgartira olmaydi (FR-MAP-09).</p>
+    </div></div>
+
+    <div class="card"><div class="card-body">
+      <span class="t-label t-muted">Sotuvchi kiritgan</span>
+      <p class="data-claimed">Ultra-zamonaviy 3 xonali shinam kvartira. Panorama oyna,
+        aqlli uy tizimi va premium pardozlash.</p>
+      <p class="t-caption">Neytral ko'rinish — da'vo, o'lchov emas.</p>
+    </div></div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<section class="sg-section">
+  <h2>9. Teglar</h2>
+  <div class="sg-row">
+    <span class="badge badge-tour">360° TUR</span>
+    <span class="badge badge-vip">★ VIP</span>
+    <span class="badge badge-verified">✓ Tasdiqlangan sotuvchi</span>
+    <span class="badge badge-neutral">Ikkilamchi bozor</span>
+    <span class="badge badge-success">Chop etilgan</span>
+    <span class="badge badge-warning">Moderatsiyada</span>
+    <span class="badge badge-danger">Rad etilgan</span>
+  </div>
+  <p class="sg-note" style="margin-top: var(--space-4)">
+    Har bir teg <strong>rang + belgi/matn</strong> bilan farqlanadi — faqat rangga tayanmaydi.
+    Erkaklarning ~8% i rang ko'rlikka ega (TZ NFR-A11Y bo'limi).
+  </p>
+</section>
+
+<!-- ====================================================================== -->
+<section class="sg-section">
+  <h2>10. E'lon kartochkasi</h2>
+  <p class="sg-note">
+    Katalogning asosiy komponenti. <code>aspect-ratio</code> majburiy — CLS oldini oladi (NFR-PERF-05).
+    "360° TUR" tegi <strong>faqat panorama mavjud bo'lganda</strong> chiziladi (FR-CAT-11) —
+    prototipdagi soxta va'da takrorlanmaydi.
+  </p>
+  <div class="grid-listings">
+    <article class="card card-interactive">
+      <div class="card-media" style="background: linear-gradient(135deg, var(--p-slate-300), var(--p-slate-400))">
+        <div style="position:absolute; top: var(--space-3); left: var(--space-3); display:flex; gap: var(--space-2)">
+          <span class="badge badge-tour">360°</span>
+          <span class="badge badge-vip">★ VIP</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <span class="t-price">1 450 000 000 so'm</span>
+        <strong style="font-size: var(--text-base)">Tashkent City, 3 xonali</strong>
+        <span class="t-small t-muted">Shayxontohur tumani, Toshkent</span>
+        <div class="cluster" style="gap: var(--space-3); font-size: var(--text-sm)">
+          <span>3 xona</span><span>112 m²</span><span>12/24 qavat</span>
+        </div>
+        <span class="data-computed">🏫 Maktab ~350 m</span>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card-media"><div class="skeleton" style="width:100%; height:100%"></div></div>
+      <div class="card-body">
+        <div class="skeleton" style="height: 1.25rem; width: 60%"></div>
+        <div class="skeleton" style="height: 1rem; width: 85%"></div>
+        <div class="skeleton" style="height: 1rem; width: 40%"></div>
+      </div>
+    </article>
+
+    <div class="empty-state">
+      <div style="font-size: var(--text-4xl)">🏠</div>
+      <strong>Bu shartlarga mos uy topilmadi</strong>
+      <p class="t-small">Narx oralig'ini kengaytiring yoki qo'shni tumanlarni qo'shib ko'ring.</p>
+      <button class="btn btn-primary btn-sm">Filtrni tozalash</button>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================================== -->
+<section class="sg-section">
+  <h2>11. Nazorat ro'yxati</h2>
+  <div class="card"><div class="card-body">
+    <p class="t-small">Har bir yangi komponent shu ro'yxatdan o'tadi:</p>
+    <ul class="stack" style="gap: var(--space-2); padding-left: var(--space-5); font-size: var(--text-sm)">
+      <li>Barcha holatlar bormi: default, hover, focus, active, disabled, loading, error, empty</li>
+      <li>Kontrast o'lchanganmi (taxmin emas)? Matn ≥ 4.5:1, interaktiv chegara ≥ 3:1</li>
+      <li>Tegish maydoni ≥ 44×44 px</li>
+      <li>Klaviatura bilan yetib boriladimi? Focus halqasi ko'rinadimi?</li>
+      <li>Faqat ikonkali tugmada <code>aria-label</code> bormi?</li>
+      <li>Faqat rangga tayanmaydimi (rang + belgi/matn)?</li>
+      <li>Uzun matn va uzun nom komponentni buzmaydimi?</li>
+      <li>Light va dark — <strong>ikkalasida ham</strong> tekshirildimi?</li>
+      <li>Xom qiymat (hex, px) yozilmaganmi — faqat token?</li>
+    </ul>
+  </div></div>
+</section>
+
+</main>
+
+<script>
+  // Mavzu almashtirish — tanlov saqlanadi
+  const root = document.documentElement;
+  const btn = document.getElementById('themeToggle');
+  const label = document.getElementById('themeLabel');
+
+  const stored = localStorage.getItem('sg-theme');
+  if (stored) root.setAttribute('data-theme', stored);
+
+  const current = () =>
+    root.getAttribute('data-theme') ||
+    (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+  const paint = () => { label.textContent = current() === 'dark' ? '☀️ Light' : '🌙 Dark'; };
+
+  btn.addEventListener('click', () => {
+    const next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('sg-theme', next);
+    paint();
+  });
+
+  paint();
+</script>
+</body>
+</html>
