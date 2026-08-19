@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sahifa topilmadi — 3DS Home</title>
+<script>
+  try { const t = localStorage.getItem('3ds-theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch {}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/tokens.css">
+<link rel="stylesheet" href="../src/base.css">
+<link rel="stylesheet" href="../src/components.css">
+<style>
+  .suggest { display: grid; gap: var(--space-3); grid-template-columns: 1fr;
+             width: 100%; max-width: 34rem; margin-top: var(--space-4); }
+  @media (min-width: 40rem) { .suggest { grid-template-columns: 1fr 1fr; } }
+  .suggest a { display: flex; align-items: center; gap: var(--space-3);
+               padding: var(--space-4); text-align: start; text-decoration: none;
+               background: var(--color-bg-surface); border: 1px solid var(--color-border-divider);
+               border-radius: var(--radius-md); color: var(--color-text-primary); }
+  .suggest a:hover { background: var(--color-bg-hover); }
+  .demo-switch { display: flex; justify-content: center; padding-top: var(--space-5); }
+</style>
+</head>
+
+<body>
+<a class="skip-link" href="#main">Asosiy kontentga o'tish</a>
+
+<header class="app-header">
+  <div class="container">
+    <a class="brand" href="catalog.html">
+      <span class="brand-mark" aria-hidden="true">3D</span>
+      <span>3DS<span style="color: var(--color-text-brand)">HOME</span></span>
+    </a>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-icon" id="themeBtn" aria-label="Mavzuni almashtirish">🌓</button>
+    </div>
+  </div>
+</header>
+
+<!-- Faqat maket uchun: ikkala holatni ko'rish -->
+<div class="demo-switch">
+  <div class="segmented" role="group" aria-label="Xato turi (faqat maket uchun)">
+    <button id="btn404" aria-pressed="true">404</button>
+    <button id="btn500" aria-pressed="false">500</button>
+  </div>
+</div>
+
+<main id="main" class="container">
+
+  <!-- ================= 404 ================= -->
+  <section class="error-page" id="page404">
+    <span class="error-code" aria-hidden="true">404</span>
+    <h1 class="t-title">Bu e'lon topilmadi</h1>
+    <p>
+      E'lon sotilgan bo'lishi yoki sotuvchi tomonidan o'chirilgan bo'lishi mumkin.
+      Havola noto'g'ri terilgan bo'lsa ham shu sahifa chiqadi.
+    </p>
+
+    <div class="cluster" style="gap: var(--space-2); justify-content: center">
+      <a class="btn btn-primary" href="catalog.html">Katalogga qaytish</a>
+      <button class="btn btn-secondary" onclick="history.back()">Orqaga</button>
+    </div>
+
+    <nav class="suggest" aria-label="Foydali havolalar">
+      <a href="catalog.html">
+        <span style="font-size: var(--text-2xl)" aria-hidden="true">🔍</span>
+        <span>
+          <strong class="t-small">O'xshash uylarni ko'rish</strong>
+          <span class="t-caption" style="display:block">Samarqandda 128 ta e'lon</span>
+        </span>
+      </a>
+      <a href="#">
+        <span style="font-size: var(--text-2xl)" aria-hidden="true">🗺️</span>
+        <span>
+          <strong class="t-small">Xaritadan qidirish</strong>
+          <span class="t-caption" style="display:block">Hudud bo'yicha tanlang</span>
+        </span>
+      </a>
+    </nav>
+  </section>
+
+  <!-- ================= 500 ================= -->
+  <section class="error-page" id="page500" hidden>
+    <span class="error-code" style="color: var(--color-danger-text)" aria-hidden="true">500</span>
+    <h1 class="t-title">Bizning tomonda nosozlik</h1>
+    <p>
+      Kechirasiz — bu sizning xatoyingiz emas. Serverda muammo yuz berdi va
+      jamoamizga xabar yuborildi. Bir necha daqiqadan so'ng qayta urinib ko'ring.
+    </p>
+
+    <div class="cluster" style="gap: var(--space-2); justify-content: center">
+      <button class="btn btn-primary" onclick="location.reload()">Qayta urinish</button>
+      <a class="btn btn-secondary" href="catalog.html">Bosh sahifaga</a>
+    </div>
+
+    <p class="t-caption" style="margin-top: var(--space-2)">
+      Muammo takrorlansa: <strong>support@3dshome.uz</strong>
+      <br>Xato kodi: <code style="font-family: var(--font-mono)">ERR-7F3A-2026</code>
+    </p>
+  </section>
+</main>
+
+<script type="module">
+  import { Theme } from '../src/components.js';
+  Theme.init();
+  document.getElementById('themeBtn').addEventListener('click', () => Theme.toggle());
+
+  const p404 = document.getElementById('page404');
+  const p500 = document.getElementById('page500');
+  const b404 = document.getElementById('btn404');
+  const b500 = document.getElementById('btn500');
+
+  const show = is404 => {
+    p404.hidden = !is404; p500.hidden = is404;
+    b404.setAttribute('aria-pressed', String(is404));
+    b500.setAttribute('aria-pressed', String(!is404));
+    document.title = (is404 ? 'Sahifa topilmadi' : 'Server xatosi') + ' — 3DS Home';
+  };
+  b404.addEventListener('click', () => show(true));
+  b500.addEventListener('click', () => show(false));
+</script>
+</body>
+</html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E'lon berish — 3DS Home</title>
+<script>
+  try { const t = localStorage.getItem('3ds-theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch {}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/tokens.css">
+<link rel="stylesheet" href="../src/base.css">
+<link rel="stylesheet" href="../src/components.css">
+<style>
+  .form-shell { max-width: 46rem; margin-inline: auto; }
+  .form-grid { display: grid; gap: var(--space-4); grid-template-columns: 1fr; }
+  @media (min-width: 40rem) { .form-grid-2 { grid-template-columns: 1fr 1fr; } }
+  .section-card { padding: var(--space-5); background: var(--color-bg-surface);
+                  border: 1px solid var(--color-border-divider); border-radius: var(--radius-lg);
+                  margin-bottom: var(--space-4); }
+  .section-card > h2 { font-size: var(--text-lg); margin-bottom: var(--space-1); }
+  .section-card > .lead { font-size: var(--text-sm); color: var(--color-text-muted);
+                          margin-bottom: var(--space-5); }
+  .map-pick { aspect-ratio: 16/10; border-radius: var(--radius-md); display: grid; place-items: center;
+              background-color: #020617; background-image: linear-gradient(135deg, #1E293B, #020617);
+              cursor: crosshair; border: 1px solid var(--color-border-divider); text-align: center; }
+  .thumb-row { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-3); }
+  .thumb { width: 4.5rem; height: 4.5rem; border-radius: var(--radius-md); position: relative;
+           background: linear-gradient(135deg, #475569, #1E293B); }
+  .thumb button { position: absolute; top: -0.4rem; inset-inline-end: -0.4rem;
+                  width: 1.5rem; height: 1.5rem; min-height: 0; padding: 0; border-radius: var(--radius-full);
+                  background: var(--color-count-bg); color: var(--color-count-text); border: 0;
+                  font-size: var(--text-xs); cursor: pointer; }
+  .desktop-only { display: none; }
+  @media (min-width: 62rem) { .desktop-only { display: flex; } .mobile-only { display: none !important; } }
+</style>
+</head>
+
+<body class="has-bottom-nav">
+<a class="skip-link" href="#main">Asosiy kontentga o'tish</a>
+
+<header class="app-header">
+  <div class="container">
+    <a class="brand" href="catalog.html">
+      <span class="brand-mark" aria-hidden="true">3D</span>
+      <span>3DS<span style="color: var(--color-text-brand)">HOME</span></span>
+    </a>
+    <nav class="main-nav" aria-label="Asosiy">
+      <a class="nav-link" href="catalog.html">Katalog</a>
+      <a class="nav-link" href="#">Xarita</a>
+      <a class="nav-link" href="post.html" aria-current="page">E'lon berish</a>
+    </nav>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-icon" id="themeBtn" aria-label="Mavzuni almashtirish">🌓</button>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="container">
+  <div class="form-shell" style="padding-block: var(--space-5)">
+
+    <h1 class="t-title">Yangi e'lon joylash</h1>
+    <p class="t-small t-muted" style="margin-top: var(--space-1); margin-bottom: var(--space-5)">
+      E'lon moderatordan o'tgach katalogda ko'rinadi. Odatda 2 soat ichida.
+    </p>
+
+    <!-- ---------- BOSQICHLAR ---------- -->
+    <div class="stepper" style="margin-bottom: var(--space-6)" aria-label="Bosqichlar">
+      <span class="step" data-state="done"><span class="step-dot" aria-hidden="true">✓</span>Turi</span>
+      <span class="step-line" aria-hidden="true"></span>
+      <span class="step" data-state="current"><span class="step-dot" aria-hidden="true">2</span>Ma'lumot</span>
+      <span class="step-line" aria-hidden="true"></span>
+      <span class="step"><span class="step-dot" aria-hidden="true">3</span>Media</span>
+      <span class="step-line" aria-hidden="true"></span>
+      <span class="step"><span class="step-dot" aria-hidden="true">4</span>Joylashuv</span>
+    </div>
+
+    <form id="postForm" novalidate>
+
+      <!-- ================= BITIM TURI ================= -->
+      <section class="section-card" aria-labelledby="s1">
+        <h2 id="s1">Bitim turi</h2>
+        <p class="lead">Narx mantiqи bitim turiga qarab butunlay farq qiladi.</p>
+        <div class="segmented" role="group" aria-label="Bitim turi">
+          <button type="button" aria-pressed="true">Sotuv</button>
+          <button type="button" aria-pressed="false">Ijara</button>
+        </div>
+      </section>
+
+      <!-- ================= ASOSIY MA'LUMOT ================= -->
+      <section class="section-card" aria-labelledby="s2">
+        <h2 id="s2">Asosiy ma'lumot</h2>
+        <p class="lead">Sarlavha aniq bo'lsin — xaridor birinchi shuni o'qiydi.</p>
+
+        <div class="form-grid">
+          <div class="field">
+            <label class="field-label" data-required for="title">E'lon sarlavhasi</label>
+            <input class="input" id="title" maxlength="80" enterkeyhint="next"
+                   placeholder="Masalan: Registon yaqinida 3 xonali kvartira">
+            <span class="field-hint">Manzil va xona sonini kiriting. 80 belgigacha.</span>
+          </div>
+
+          <div class="form-grid form-grid-2">
+            <div class="field">
+              <label class="field-label" data-required for="price">Narxi (so'm)</label>
+              <!-- inputmode=numeric → mobil raqam klaviaturasi (NFR-UX-10) -->
+              <input class="input" id="price" type="number" inputmode="numeric"
+                     min="1000000" step="1000000" placeholder="1 240 000 000">
+            </div>
+            <div class="field">
+              <label class="field-label" data-required for="area">Maydoni (m²)</label>
+              <input class="input" id="area" type="number" inputmode="decimal" min="1" placeholder="96">
+            </div>
+          </div>
+
+          <div class="form-grid form-grid-2">
+            <div class="field">
+              <label class="field-label" data-required for="rooms">Xonalar soni</label>
+              <select class="select" id="rooms">
+                <option value="">Tanlang</option>
+                <option>1</option><option>2</option><option>3</option>
+                <option>4</option><option>5</option><option>6+</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="field-label" for="year">Qurilgan yili</label>
+              <input class="input" id="year" type="number" inputmode="numeric" min="1900" max="2030" placeholder="2023">
+            </div>
+          </div>
+
+          <!-- FR-POST-05: prototipda qavat maydonlari YO'Q edi, 5/12 qotirilgan edi -->
+          <div class="form-grid form-grid-2">
+            <div class="field">
+              <label class="field-label" data-required for="floor">Qavat</label>
+              <input class="input" id="floor" type="number" inputmode="numeric" min="1" placeholder="4">
+              <span class="field-hint">Hovli bo'lsa — 1</span>
+            </div>
+            <div class="field">
+              <!-- XATO HOLATI namunasi -->
+              <label class="field-label" data-required for="totalFloors">Binodagi qavatlar</label>
+              <input class="input" id="totalFloors" type="number" inputmode="numeric" min="1"
+                     value="2" aria-invalid="true" aria-describedby="errFloors">
+              <span class="field-error" id="errFloors" role="alert">
+                <span aria-hidden="true">⚠</span> Binodagi qavatlar soni qavatdan kichik bo'lishi mumkin emas
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= MEDIA — MAJBURIY PANORAMA ================= -->
+      <section class="section-card" aria-labelledby="s3">
+        <h2 id="s3">Suratlar va 360° panorama</h2>
+        <p class="lead">
+          Panoramasiz e'lon <strong>chop etilmaydi</strong> — bu platformaning asosiy va'dasi.
+        </p>
+
+        <div class="field" style="margin-bottom: var(--space-5)">
+          <span class="field-label" data-required>Oddiy suratlar (kamida 3 ta)</span>
+          <div class="dropzone" role="button" tabindex="0">
+            <span style="font-size: var(--text-2xl)" aria-hidden="true">🖼️</span>
+            <strong class="t-small">Suratlarni bu yerga tashlang</strong>
+            <span class="t-caption">JPG, PNG yoki WebP · har biri 10 MB gacha</span>
+          </div>
+          <div class="thumb-row">
+            <div class="thumb"><button type="button" aria-label="1-suratni o'chirish">✕</button></div>
+            <div class="thumb"><button type="button" aria-label="2-suratni o'chirish">✕</button></div>
+            <div class="thumb"><button type="button" aria-label="3-suratni o'chirish">✕</button></div>
+          </div>
+          <span class="field-hint">3 / 3 — minimal talab bajarildi ✓</span>
+        </div>
+
+        <div class="field">
+          <span class="field-label" data-required>360° panorama (kamida 1 ta)</span>
+          <div class="dropzone" data-required-missing="true" role="button" tabindex="0">
+            <span style="font-size: var(--text-2xl)" aria-hidden="true">🌐</span>
+            <strong class="t-small">Panorama hali yuklanmadi</strong>
+            <span class="t-caption">Nisbati 2:1 · kamida 4000 × 2000 px · 25 MB gacha</span>
+          </div>
+          <span class="field-error" role="alert">
+            <span aria-hidden="true">⚠</span> Panorama majburiy — busiz e'lonni chop etib bo'lmaydi
+          </span>
+
+          <div class="card" style="margin-top: var(--space-3); background: var(--color-action-subtle-bg); border-color: transparent">
+            <div class="card-body" style="gap: var(--space-2)">
+              <strong class="t-small">360° suratni telefonda qanday olish mumkin?</strong>
+              <p class="t-caption" style="margin:0">
+                Google Street View, Kuula yoki Panorama 360 ilovasini o'rnating —
+                telefonni aylantirib turib surat oling. Maxsus kamera shart emas.
+              </p>
+              <div class="cluster" style="gap: var(--space-2)">
+                <button type="button" class="btn btn-secondary btn-sm">Qo'llanmani ochish</button>
+                <button type="button" class="btn btn-ghost btn-sm">Suratga olish xizmatiga buyurtma</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= JOYLASHUV — MAJBURIY ================= -->
+      <section class="section-card" aria-labelledby="s4">
+        <h2 id="s4">Joylashuv</h2>
+        <p class="lead">
+          Xaritada nuqta belgilanmasa e'lon yuborilmaydi. Infratuzilma masofasi shu nuqtadan hisoblanadi.
+        </p>
+
+        <div class="form-grid form-grid-2" style="margin-bottom: var(--space-4)">
+          <div class="field">
+            <label class="field-label" data-required for="region">Viloyat</label>
+            <select class="select" id="region">
+              <option value="">Tanlang</option>
+              <option>Toshkent shahri</option><option>Toshkent viloyati</option>
+              <option>Andijon viloyati</option><option>Buxoro viloyati</option>
+              <option>Farg'ona viloyati</option><option>Jizzax viloyati</option>
+              <option>Namangan viloyati</option><option>Navoiy viloyati</option>
+              <option selected>Samarqand viloyati</option><option>Sirdaryo viloyati</option>
+              <option>Surxondaryo viloyati</option><option>Qashqadaryo viloyati</option>
+              <option>Xorazm viloyati</option><option>Qoraqalpog'iston Respublikasi</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" data-required for="district">Tuman / shahar</label>
+            <select class="select" id="district">
+              <option value="">Avval viloyatni tanlang</option>
+              <option selected>Samarqand shahri</option>
+              <option>Samarqand tumani</option><option>Urgut tumani</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom: var(--space-4)">
+          <label class="field-label" for="addr">Ko'cha va uy raqami</label>
+          <input class="input" id="addr" placeholder="Registon ko'chasi 14">
+        </div>
+
+        <div class="field">
+          <span class="field-label" data-required>Xaritadagi aniq nuqta</span>
+          <div class="map-pick surface-immersive" id="mapPick" role="button" tabindex="0"
+               aria-label="Xaritada uy joyini belgilash">
+            <div>
+              <div style="font-size: var(--text-4xl)" aria-hidden="true">🗺️</div>
+              <strong class="t-small">Uy joyini belgilash uchun bosing</strong>
+              <div class="t-caption" style="margin-top: var(--space-1)">Nuqta belgilanmagan</div>
+            </div>
+          </div>
+          <span class="field-error" id="mapErr" role="alert">
+            <span aria-hidden="true">⚠</span> Joylashuv belgilanmagan
+          </span>
+        </div>
+      </section>
+
+      <!-- ================= TAVSIF ================= -->
+      <section class="section-card" aria-labelledby="s5">
+        <h2 id="s5">Tavsif</h2>
+        <p class="lead">Xaridor uchun muhim tafsilotlar: hujjatlar, ta'mir, qo'shnilar.</p>
+        <div class="field">
+          <label class="field-label" for="desc">Qo'shimcha ma'lumot</label>
+          <textarea class="input" id="desc" rows="5" maxlength="2000"
+            placeholder="Masalan: Ta'mir to'liq tugallangan, oshxona jihozlari qoladi. Hujjatlar tayyor, kadastr mavjud."></textarea>
+          <span class="field-hint">0 / 2000</span>
+        </div>
+      </section>
+
+      <div class="cluster" style="gap: var(--space-3); margin-bottom: var(--space-8)">
+        <button type="button" class="btn btn-secondary">Qoralama sifatida saqlash</button>
+        <button type="submit" class="btn btn-primary" id="submitBtn" style="flex:1">
+          E'lonni moderatsiyaga yuborish
+        </button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<nav class="bottom-nav" aria-label="Asosiy (mobil)">
+  <a class="bottom-nav-item" href="catalog.html"><span class="bottom-nav-icon" aria-hidden="true">🔍</span>Katalog</a>
+  <a class="bottom-nav-item" href="#"><span class="bottom-nav-icon" aria-hidden="true">🗺️</span>Xarita</a>
+  <a class="bottom-nav-item" href="post.html" aria-current="page"><span class="bottom-nav-icon" aria-hidden="true">➕</span>E'lon</a>
+  <a class="bottom-nav-item" href="#"><span class="bottom-nav-icon" aria-hidden="true">♡</span>Saqlangan</a>
+  <a class="bottom-nav-item" href="#"><span class="bottom-nav-icon" aria-hidden="true">👤</span>Profil</a>
+</nav>
+
+<script type="module">
+  import { Toast, Theme, guardSubmit } from '../src/components.js';
+
+  Theme.init();
+  document.getElementById('themeBtn').addEventListener('click', () => Theme.toggle());
+
+  document.querySelectorAll('.segmented').forEach(g =>
+    g.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      g.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', 'false'));
+      b.setAttribute('aria-pressed', 'true');
+    })));
+
+  // Xaritada nuqta tanlash — FR-POST-06/07.
+  // Holat KOMPONENTDA saqlanadi, window global emas (prototipdagi BUG-A1).
+  const state = { lat: null, lng: null };
+  const mapPick = document.getElementById('mapPick');
+  const mapErr = document.getElementById('mapErr');
+
+  const pickLocation = () => {
+    state.lat = 39.6547; state.lng = 66.9597;
+    mapPick.innerHTML =
+      '<div><div style="font-size:var(--text-4xl)" aria-hidden="true">📍</div>' +
+      '<strong class="t-small">Nuqta belgilandi</strong>' +
+      '<div class="t-caption" style="margin-top:var(--space-1)">39.6547° N, 66.9597° E</div></div>';
+    mapErr.style.display = 'none';
+    Toast.success('Yaqin-atrofdagi 9 ta obyekt masofasi hisoblandi', { title: 'Joylashuv belgilandi' });
+  };
+  mapPick.addEventListener('click', pickLocation);
+  mapPick.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickLocation(); }
+  });
+
+  // Belgilar hisoblagichi
+  const desc = document.getElementById('desc');
+  desc.addEventListener('input', () => {
+    desc.nextElementSibling.textContent = `${desc.value.length} / 2000`;
+  });
+
+  // Yuborish — bir martalik himoya (FR-PAY-04 naqshi)
+  const btn = document.getElementById('submitBtn');
+  document.getElementById('postForm').addEventListener('submit', e => {
+    e.preventDefault();
+    guardSubmit(btn, async () => {
+      const missing = [];
+      if (!state.lat) missing.push('xaritadagi nuqta');
+      if (document.querySelector('[data-required-missing="true"]')) missing.push('360° panorama');
+      if (!document.getElementById('title').value.trim()) missing.push('sarlavha');
+
+      await new Promise(r => setTimeout(r, 600));
+
+      if (missing.length) {
+        Toast.error(`To'ldirilmagan: ${missing.join(', ')}`, { title: 'E\'lon yuborilmadi' });
+        return;
+      }
+      Toast.success('Moderator 2 soat ichida ko\'rib chiqadi', { title: 'E\'lon yuborildi' });
+    })();
+  });
+</script>
+</body>
+</html>

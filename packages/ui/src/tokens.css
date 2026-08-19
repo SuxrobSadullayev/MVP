@@ -49,6 +49,7 @@
   --p-gold-300:   #FCD34D;
   --p-gold-400:   #FBBF24;
   --p-gold-500:   #F59E0B;
+  --p-gold-600:   #D97706;  /* reyting yulduzi — light. gold-500 oq fonda 2.15 ❌ */
   --p-gold-700:   #B45309;
   --p-gold-800:   #854D0E;  /* light matn. gold-700 tint fonda 4.51 — juda tor */
   --p-gold-900:   #78350F;
@@ -247,7 +248,10 @@
 
   --color-vip-text: var(--p-gold-800);   /* tint 6.15 ✅ */
   --color-vip-bg:   var(--p-gold-100);
-  --color-vip-icon: var(--p-gold-500);
+  --color-vip-icon: var(--p-gold-600);  /* grafik, WCAG 1.4.11: 3.04 ✅ */
+
+  --color-count-bg:   var(--p-red-700);   /* oq matn 6.29 ✅ */
+  --color-count-text: var(--p-slate-0);
 
   --color-verified-text: var(--p-green-800);  /* tint 6.78 ✅ */
   --color-verified-bg:   var(--p-green-100);
@@ -319,6 +323,9 @@
   --color-vip-bg:   var(--p-gold-900);
   --color-vip-icon: var(--p-gold-400);
 
+  --color-count-bg:   var(--p-red-400);   /* slate-900 matn 6.63 ✅ */
+  --color-count-text: var(--p-slate-900);
+
   --color-verified-text: var(--p-green-400);
   --color-verified-bg:   var(--p-green-900);
 
@@ -383,6 +390,8 @@
     --color-vip-text: var(--p-gold-400);
     --color-vip-bg:   var(--p-gold-900);
     --color-vip-icon: var(--p-gold-400);
+    --color-count-bg:   var(--p-red-400);
+    --color-count-text: var(--p-slate-900);
     --color-verified-text: var(--p-green-400);
     --color-verified-bg:   var(--p-green-900);
 

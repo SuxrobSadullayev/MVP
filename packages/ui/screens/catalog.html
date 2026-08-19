@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uylar katalogi — 3DS Home</title>
+<script>
+  // FOUC oldini olish — render'dan OLDIN
+  try { const t = localStorage.getItem('3ds-theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch {}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/tokens.css">
+<link rel="stylesheet" href="../src/base.css">
+<link rel="stylesheet" href="../src/components.css">
+<style>
+  /* Faqat shu maket uchun — rasm o'rniga gradient (soxta foto ishlatilmaydi) */
+  .photo-1 { background: linear-gradient(135deg, #64748B, #334155); }
+  .photo-2 { background: linear-gradient(135deg, #0E7490, #164E63); }
+  .photo-3 { background: linear-gradient(135deg, #B45309, #78350F); }
+  .photo-4 { background: linear-gradient(135deg, #047857, #064E3B); }
+  .photo-5 { background: linear-gradient(135deg, #475569, #1E293B); }
+  .photo-6 { background: linear-gradient(135deg, #0891B2, #155E75); }
+
+  .filter-bar { position: sticky; top: var(--header-height); z-index: var(--z-sticky);
+                background: var(--color-bg-canvas); padding-block: var(--space-3);
+                border-bottom: 1px solid var(--color-border-divider); }
+  .search-row { display: flex; gap: var(--space-2); }
+  .search-row .input { flex: 1; }
+  .desktop-only { display: none; }
+  @media (min-width: 62rem) { .desktop-only { display: flex; } .mobile-only { display: none !important; } }
+  .result-head { display: flex; align-items: center; justify-content: space-between;
+                 gap: var(--space-3); flex-wrap: wrap; padding-block: var(--space-5) var(--space-4); }
+  .card-badges { position: absolute; top: var(--space-3); inset-inline-start: var(--space-3);
+                 display: flex; gap: var(--space-2); flex-wrap: wrap; }
+  .card-fav { position: absolute; top: var(--space-2); inset-inline-end: var(--space-2); }
+  .fav-btn { background: rgb(2 6 23 / 0.55); border-color: transparent; color: var(--p-slate-0);
+             backdrop-filter: blur(6px); }
+  .fav-btn[aria-pressed="true"] { background: var(--p-brand-400); color: var(--p-slate-900); }
+  .card-specs { display: flex; flex-wrap: wrap; gap: var(--space-3); font-size: var(--text-sm);
+                color: var(--color-text-secondary); }
+  .card-specs > span { display: inline-flex; align-items: center; gap: var(--space-1); }
+</style>
+</head>
+
+<body class="has-bottom-nav">
+<a class="skip-link" href="#main">Asosiy kontentga o'tish</a>
+
+<!-- ================= HEADER ================= -->
+<header class="app-header">
+  <div class="container">
+    <a class="brand" href="catalog.html">
+      <span class="brand-mark" aria-hidden="true">3D</span>
+      <span>3DS<span style="color: var(--color-text-brand)">HOME</span></span>
+    </a>
+
+    <nav class="main-nav" aria-label="Asosiy">
+      <a class="nav-link" href="catalog.html" aria-current="page">Katalog</a>
+      <a class="nav-link" href="#">Xarita</a>
+      <a class="nav-link" href="post.html">E'lon berish</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-icon has-badge" aria-label="Saqlanganlar — 3 ta">
+        ♡<span class="count-badge" aria-hidden="true">3</span>
+      </button>
+      <button class="btn btn-ghost btn-icon has-badge" aria-label="Xabarlar — 2 ta o'qilmagan">
+        ✉<span class="count-badge" aria-hidden="true">2</span>
+      </button>
+      <button class="btn btn-ghost btn-icon" id="themeBtn" aria-label="Mavzuni almashtirish">🌓</button>
+      <button class="btn btn-primary btn-sm desktop-only">Kirish</button>
+    </div>
+  </div>
+</header>
+
+<!-- ================= FILTRLAR ================= -->
+<div class="filter-bar">
+  <div class="container stack" style="gap: var(--space-3)">
+
+    <div class="search-row">
+      <!-- inputmode=search → mobil klaviaturada "Qidirish" tugmasi (NFR-UX-10) -->
+      <input class="input" type="search" inputmode="search" enterkeyhint="search"
+             placeholder="Shahar, tuman yoki majmua nomi" aria-label="Qidiruv">
+      <button class="btn btn-secondary mobile-only" id="filterBtn" aria-label="Filtrlar">
+        ⚙ <span class="count-badge" style="position: static; margin-inline-start: var(--space-1)">2</span>
+      </button>
+    </div>
+
+    <!-- Bitim turi — birinchi darajali filtr (TZ FR-CAT-14) -->
+    <div class="segmented" role="group" aria-label="Bitim turi">
+      <button aria-pressed="true">Sotuv</button>
+      <button aria-pressed="false">Ijara</button>
+    </div>
+
+    <div class="chip-row desktop-only" role="group" aria-label="Tez filtrlar">
+      <button class="chip" aria-pressed="true">✓ Samarqand</button>
+      <button class="chip" aria-pressed="false">2 xona</button>
+      <button class="chip" aria-pressed="false">3 xona</button>
+      <button class="chip" aria-pressed="true">✓ 360° tur bor</button>
+      <button class="chip" aria-pressed="false">Yangi inshoot</button>
+      <button class="chip" aria-pressed="false">VIP</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= NATIJALAR ================= -->
+<main id="main" class="container">
+
+  <nav class="breadcrumb" aria-label="Yo'l" style="padding-top: var(--space-4)">
+    <a href="#">Bosh sahifa</a><span class="breadcrumb-sep" aria-hidden="true">/</span>
+    <a href="#">Sotuv</a><span class="breadcrumb-sep" aria-hidden="true">/</span>
+    <span aria-current="page">Samarqand viloyati</span>
+  </nav>
+
+  <div class="result-head">
+    <div>
+      <h1 class="t-title">Samarqandda sotuvdagi uylar</h1>
+      <p class="t-small t-muted"><strong>128</strong> ta e'lon topildi</p>
+    </div>
+    <label class="field" style="min-width: 12rem">
+      <span class="sr-only">Saralash</span>
+      <select class="select" aria-label="Saralash">
+        <option>Eng yangi</option>
+        <option>Avval arzoni</option>
+        <option>Avval qimmati</option>
+        <option>Maydoni bo'yicha</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="grid-listings">
+
+    <!-- ---- Kartochka 1 ---- -->
+    <article class="card card-interactive">
+      <div class="card-media photo-1">
+        <div class="card-badges">
+          <span class="badge badge-tour">360° tur</span>
+          <span class="badge badge-vip">★ VIP</span>
+        </div>
+        <div class="card-fav">
+          <button class="btn btn-icon fav-btn" aria-label="Saqlanganlarga qo'shish" aria-pressed="false">♡</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <span class="t-price">1 240 000 000 so'm</span>
+        <a class="card-link" href="listing.html">
+          Registon yaqinida 3 xonali kvartira
+        </a>
+        <span class="t-small t-muted">Samarqand shahri, Registon ko'chasi</span>
+        <div class="card-specs">
+          <span>3 xona</span><span>96 m²</span><span>4/9 qavat</span>
+        </div>
+        <span class="data-computed">🏫 Maktab ~280 m · 4 daq</span>
+      </div>
+    </article>
+
+    <!-- ---- Kartochka 2 ---- -->
+    <article class="card card-interactive">
+      <div class="card-media photo-2">
+        <div class="card-badges"><span class="badge badge-tour">360° tur</span></div>
+        <div class="card-fav">
+          <button class="btn btn-icon fav-btn" aria-label="Saqlanganlardan olish" aria-pressed="true">♥</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <span class="t-price">680 000 000 so'm</span>
+        <a class="card-link" href="listing.html">
+          Universitet bulvari, 2 xonali</a>
+        <span class="t-small t-muted">Samarqand shahri, Universitet bulvari</span>
+        <div class="card-specs"><span>2 xona</span><span>58 m²</span><span>7/12 qavat</span></div>
+        <span class="data-computed">🚌 Bekat ~140 m · 2 daq</span>
+      </div>
+    </article>
+
+    <!-- ---- Kartochka 3 — tasdiqlangan sotuvchi ---- -->
+    <article class="card card-interactive">
+      <div class="card-media photo-3">
+        <div class="card-badges">
+          <span class="badge badge-tour">360° tur</span>
+          <span class="badge badge-verified">✓ Tasdiqlangan</span>
+        </div>
+        <div class="card-fav">
+          <button class="btn btn-icon fav-btn" aria-label="Saqlanganlarga qo'shish" aria-pressed="false">♡</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <span class="t-price">2 100 000 000 so'm</span>
+        <a class="card-link" href="listing.html">
+          Zamonaviy hovli, 6 xonali</a>
+        <span class="t-small t-muted">Samarqand tumani, Bog'ishamol</span>
+        <div class="card-specs"><span>6 xona</span><span>240 m²</span><span>2 qavat</span></div>
+        <span class="data-computed">🏥 Shifoxona ~620 m · 8 daq</span>
+      </div>
+    </article>
+
+    <!-- ---- Kartochka 4 ---- -->
+    <article class="card card-interactive">
+      <div class="card-media photo-4">
+        <div class="card-badges"><span class="badge badge-tour">360° tur</span></div>
+        <div class="card-fav">
+          <button class="btn btn-icon fav-btn" aria-label="Saqlanganlarga qo'shish" aria-pressed="false">♡</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <span class="t-price">890 000 000 so'm</span>
+        <a class="card-link" href="listing.html">
+          Sattepo, 3 xonali yangi inshoot</a>
+        <span class="t-small t-muted">Samarqand shahri, Sattepo</span>
+        <div class="card-specs"><span>3 xona</span><span>82 m²</span><span>5/16 qavat</span></div>
+        <span class="data-computed">🛒 Supermarket ~90 m · 1 daq</span>
+      </div>
+    </article>
+
+    <!-- ---- Skeleton (yuklanmoqda) ---- -->
+    <article class="card" aria-hidden="true">
+      <div class="card-media"><div class="skeleton" style="width:100%;height:100%"></div></div>
+      <div class="card-body">
+        <div class="skeleton" style="height:1.25rem;width:55%"></div>
+        <div class="skeleton" style="height:1rem;width:85%"></div>
+        <div class="skeleton" style="height:1rem;width:70%"></div>
+        <div class="skeleton" style="height:1rem;width:45%"></div>
+      </div>
+    </article>
+
+    <article class="card" aria-hidden="true">
+      <div class="card-media"><div class="skeleton" style="width:100%;height:100%"></div></div>
+      <div class="card-body">
+        <div class="skeleton" style="height:1.25rem;width:60%"></div>
+        <div class="skeleton" style="height:1rem;width:80%"></div>
+        <div class="skeleton" style="height:1rem;width:65%"></div>
+        <div class="skeleton" style="height:1rem;width:50%"></div>
+      </div>
+    </article>
+  </div>
+
+  <!-- ---- Sahifalash — TZ FR-CAT-05 ---- -->
+  <nav class="pagination" aria-label="Sahifalar" style="margin-block: var(--space-7)">
+    <button class="page-btn" disabled aria-label="Oldingi sahifa">‹</button>
+    <button class="page-btn" aria-current="page" aria-label="Sahifa 1">1</button>
+    <button class="page-btn" aria-label="Sahifa 2">2</button>
+    <button class="page-btn" aria-label="Sahifa 3">3</button>
+    <span class="page-btn" aria-hidden="true">…</span>
+    <button class="page-btn" aria-label="Sahifa 6">6</button>
+    <button class="page-btn" aria-label="Keyingi sahifa">›</button>
+  </nav>
+
+  <!-- ---- Bo'sh holat namunasi — TZ NFR-UX-15 ---- -->
+  <section style="margin-bottom: var(--space-7)">
+    <h2 class="t-heading" style="margin-bottom: var(--space-3)">Bo'sh natija holati</h2>
+    <div class="empty-state">
+      <div style="font-size: var(--text-4xl)" aria-hidden="true">🔎</div>
+      <strong>Bu shartlarga mos uy topilmadi</strong>
+      <p class="t-small">Narx oralig'ini kengaytiring yoki qo'shni tumanlarni qo'shib ko'ring.
+         Samarqand viloyatida jami <strong>128</strong> ta e'lon bor.</p>
+      <div class="cluster" style="gap: var(--space-2)">
+        <button class="btn btn-primary btn-sm">Filtrni tozalash</button>
+        <button class="btn btn-secondary btn-sm">Qo'shni tumanlar</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ================= FILTR SHEET (mobil) ================= -->
+<div class="modal-backdrop" id="filterSheet" hidden>
+  <div class="modal" aria-labelledby="filterTitle">
+    <div class="modal-header">
+      <h2 class="modal-title" id="filterTitle">Filtrlar</h2>
+      <button class="btn btn-ghost btn-icon" data-modal-close aria-label="Yopish">✕</button>
+    </div>
+    <div class="modal-body stack" style="gap: var(--space-5)">
+      <div class="field">
+        <label class="field-label" for="fRegion">Hudud</label>
+        <select class="select" id="fRegion" data-autofocus>
+          <option>Samarqand viloyati</option>
+          <option>Toshkent shahri</option>
+          <option>Buxoro viloyati</option>
+          <option>Namangan viloyati</option>
+          <option>Farg'ona viloyati</option>
+          <option>Qoraqalpog'iston Respublikasi</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label" for="fDistrict">Tuman</label>
+        <select class="select" id="fDistrict">
+          <option>Barcha tumanlar</option>
+          <option>Samarqand shahri</option>
+          <option>Samarqand tumani</option>
+          <option>Urgut tumani</option>
+        </select>
+      </div>
+      <div class="field">
+        <span class="field-label">Xonalar soni</span>
+        <div class="chip-row">
+          <button class="chip" aria-pressed="false">1</button>
+          <button class="chip" aria-pressed="true">✓ 2</button>
+          <button class="chip" aria-pressed="true">✓ 3</button>
+          <button class="chip" aria-pressed="false">4</button>
+          <button class="chip" aria-pressed="false">5+</button>
+        </div>
+      </div>
+      <div class="field">
+        <span class="field-label">Narx oralig'i (so'm)</span>
+        <div class="cluster" style="gap: var(--space-2)">
+          <input class="input" type="number" inputmode="numeric" min="0" placeholder="500 000 000" aria-label="Eng past narx" style="flex:1">
+          <span class="t-muted" aria-hidden="true">—</span>
+          <input class="input" type="number" inputmode="numeric" min="0" placeholder="2 000 000 000" aria-label="Eng yuqori narx" style="flex:1">
+        </div>
+      </div>
+      <label class="checkbox-row">
+        <input type="checkbox" checked>
+        <span>Faqat 360° turi borlar</span>
+      </label>
+      <label class="checkbox-row">
+        <input type="checkbox">
+        <span>Faqat tasdiqlangan sotuvchilar</span>
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-modal-close>Tozalash</button>
+      <button class="btn btn-primary" id="applyBtn">128 ta natijani ko'rish</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= BOTTOM NAV (mobil, thumb zone) ================= -->
+<nav class="bottom-nav" aria-label="Asosiy (mobil)">
+  <a class="bottom-nav-item" href="catalog.html" aria-current="page">
+    <span class="bottom-nav-icon" aria-hidden="true">🔍</span>Katalog</a>
+  <a class="bottom-nav-item" href="#">
+    <span class="bottom-nav-icon" aria-hidden="true">🗺️</span>Xarita</a>
+  <a class="bottom-nav-item" href="post.html">
+    <span class="bottom-nav-icon" aria-hidden="true">➕</span>E'lon</a>
+  <a class="bottom-nav-item" href="#">
+    <span class="bottom-nav-icon" aria-hidden="true">♡</span>Saqlangan</a>
+  <a class="bottom-nav-item" href="#">
+    <span class="bottom-nav-icon" aria-hidden="true">👤</span>Profil</a>
+</nav>
+
+<script type="module">
+  import { Toast, Modal, Theme, debounce } from '../src/components.js';
+
+  Theme.init();
+  document.getElementById('themeBtn').addEventListener('click', () => Theme.toggle());
+
+  const sheet = new Modal(document.getElementById('filterSheet'));
+  document.getElementById('filterBtn').addEventListener('click', () => sheet.open());
+  document.getElementById('applyBtn').addEventListener('click', () => {
+    sheet.close();
+    Toast.success('128 ta e\'lon topildi', { title: 'Filtr qo\'llandi' });
+  });
+
+  // Chip va segmented — tanlash holati
+  document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+    const on = c.getAttribute('aria-pressed') === 'true';
+    c.setAttribute('aria-pressed', String(!on));
+    c.textContent = on ? c.textContent.replace('✓ ', '') : '✓ ' + c.textContent;
+  }));
+
+  document.querySelectorAll('.segmented').forEach(g =>
+    g.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      g.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', 'false'));
+      b.setAttribute('aria-pressed', 'true');
+    })));
+
+  // Sevimlilar — FAQAT o'sha tugma yangilanadi (TZ FR-CAT-10)
+  document.querySelectorAll('.fav-btn').forEach(b => b.addEventListener('click', () => {
+    const on = b.getAttribute('aria-pressed') === 'true';
+    b.setAttribute('aria-pressed', String(!on));
+    b.textContent = on ? '♡' : '♥';
+    b.setAttribute('aria-label', on ? 'Saqlanganlarga qo\'shish' : 'Saqlanganlardan olish');
+    Toast.info(on ? 'Saqlanganlardan olindi' : 'Saqlanganlarga qo\'shildi');
+  }));
+
+  // Qidiruv — debounce 400ms (TZ FR-CAT-06)
+  const search = document.querySelector('input[type="search"]');
+  search.addEventListener('input', debounce(e => {
+    if (e.target.value.trim()) Toast.info(`Qidirilmoqda: "${e.target.value.trim()}"`);
+  }, 400));
+</script>
+</body>
+</html>

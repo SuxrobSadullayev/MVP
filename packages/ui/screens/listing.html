@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registon yaqinida 3 xonali kvartira — 3DS Home</title>
+<script>
+  try { const t = localStorage.getItem('3ds-theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch {}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/tokens.css">
+<link rel="stylesheet" href="../src/base.css">
+<link rel="stylesheet" href="../src/components.css">
+<style>
+  .pano { background: linear-gradient(160deg, #164E63 0%, #0F172A 55%, #020617 100%); }
+  .pano-2 { background: linear-gradient(160deg, #78350F 0%, #1E293B 60%, #020617 100%); }
+  .pano-3 { background: linear-gradient(160deg, #064E3B 0%, #0F172A 60%, #020617 100%); }
+
+  .detail-layout { display: grid; gap: var(--space-5); align-items: start; }
+  @media (min-width: 62rem) {
+    .detail-layout { grid-template-columns: minmax(0,1fr) 22rem; gap: var(--space-6); }
+    .detail-aside { position: sticky; top: calc(var(--header-height) + var(--space-4)); }
+  }
+
+  .spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem,1fr)); gap: var(--space-3); }
+  .spec-cell { padding: var(--space-3); background: var(--color-bg-sunken); border-radius: var(--radius-md); }
+  .spec-cell dt { font-size: var(--text-xs); color: var(--color-text-muted); }
+  .spec-cell dd { font-size: var(--text-lg); font-weight: var(--weight-semibold); margin: 0;
+                  font-variant-numeric: tabular-nums; }
+
+  .trust-head { display: flex; align-items: center; justify-content: space-between;
+                gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-3); }
+  .section { padding-block: var(--space-6); border-top: 1px solid var(--color-border-divider); }
+  .section:first-of-type { border-top: 0; }
+
+  .map-stub { aspect-ratio: 16/9; border-radius: var(--radius-lg); display: grid; place-items: center;
+              background-color: #020617; background-image: linear-gradient(135deg, #1E293B, #020617);
+              border: 1px solid var(--color-border-divider); }
+  .desktop-only { display: none; }
+  @media (min-width: 62rem) { .desktop-only { display: flex; } .mobile-only { display: none !important; } }
+</style>
+</head>
+
+<body class="has-bottom-nav">
+<a class="skip-link" href="#main">Asosiy kontentga o'tish</a>
+
+<header class="app-header">
+  <div class="container">
+    <a class="brand" href="catalog.html">
+      <span class="brand-mark" aria-hidden="true">3D</span>
+      <span>3DS<span style="color: var(--color-text-brand)">HOME</span></span>
+    </a>
+    <nav class="main-nav" aria-label="Asosiy">
+      <a class="nav-link" href="catalog.html">Katalog</a>
+      <a class="nav-link" href="#">Xarita</a>
+      <a class="nav-link" href="post.html">E'lon berish</a>
+    </nav>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-icon" id="themeBtn" aria-label="Mavzuni almashtirish">🌓</button>
+      <button class="btn btn-primary btn-sm desktop-only">Kirish</button>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="container">
+
+  <nav class="breadcrumb" aria-label="Yo'l" style="padding-top: var(--space-4)">
+    <a href="catalog.html">Katalog</a><span class="breadcrumb-sep" aria-hidden="true">/</span>
+    <a href="#">Samarqand viloyati</a><span class="breadcrumb-sep" aria-hidden="true">/</span>
+    <span aria-current="page">Registon ko'chasi</span>
+  </nav>
+
+  <div class="detail-layout" style="padding-top: var(--space-4)">
+
+    <!-- =============== CHAP USTUN =============== -->
+    <div>
+
+      <!-- ---------- 360° VIEWER (immersiv, NFR-UX-19) ---------- -->
+      <div class="viewer surface-immersive" id="viewer">
+        <div class="viewer-canvas pano" id="pano" role="img"
+             aria-label="Mehmonxonaning 360 gradusli panoramasi"></div>
+
+        <!-- Yuklanish indikatori — TZ FR-TOUR-04 -->
+        <div class="viewer-loading" id="loading">
+          <div>
+            <div class="t-small" style="margin-bottom: var(--space-2)">Panorama yuklanmoqda…</div>
+            <div class="progress-track"><div class="progress-fill" id="bar" style="width:0%"></div></div>
+            <div class="t-caption" style="margin-top: var(--space-2)" id="pct">0%</div>
+          </div>
+        </div>
+
+        <div class="viewer-topbar">
+          <div class="cluster" style="gap: var(--space-2)">
+            <span class="badge badge-tour">360° interaktiv xona</span>
+            <span class="badge badge-vip">★ VIP</span>
+          </div>
+          <button class="viewer-btn" aria-label="Yopish" onclick="history.back()">✕</button>
+        </div>
+
+        <div class="viewer-controls">
+          <button class="viewer-btn" id="rotateBtn" aria-pressed="true"
+                  aria-label="Avtomatik aylanish — yoqilgan">⟳</button>
+          <button class="viewer-btn" aria-label="To'liq ekran">⛶</button>
+          <button class="viewer-btn" aria-label="Yaqinlashtirish">＋</button>
+          <button class="viewer-btn" aria-label="Uzoqlashtirish">－</button>
+        </div>
+
+        <div class="room-strip" role="tablist" aria-label="Xonalar">
+          <button class="room-thumb" role="tab" aria-current="true" data-pano="pano">Mehmonxona</button>
+          <button class="room-thumb" role="tab" aria-current="false" data-pano="pano-2">Yotoqxona</button>
+          <button class="room-thumb" role="tab" aria-current="false" data-pano="pano-3">Oshxona</button>
+          <button class="room-thumb" role="tab" aria-current="false" data-pano="pano">Hammom</button>
+          <button class="room-thumb" role="tab" aria-current="false" data-pano="pano-2">Balkon</button>
+        </div>
+      </div>
+
+      <p class="t-caption" style="margin-top: var(--space-2)">
+        Sichqoncha bilan torting yoki barmoq bilan suring · G'ildirak / chimdish bilan masshtab
+      </p>
+
+      <!-- ---------- SARLAVHA ---------- -->
+      <div class="section">
+        <div class="cluster" style="gap: var(--space-2); margin-bottom: var(--space-3)">
+          <span class="badge badge-verified">✓ Tasdiqlangan sotuvchi</span>
+          <span class="badge badge-neutral">Yangi inshoot</span>
+          <span class="badge badge-neutral">Sotuv</span>
+        </div>
+        <h1 class="t-title">Registon yaqinida 3 xonali kvartira</h1>
+        <p class="t-small t-muted" style="margin-top: var(--space-1)">
+          Samarqand viloyati, Samarqand shahri, Registon ko'chasi 14
+        </p>
+        <div class="t-hero" style="margin-top: var(--space-4); color: var(--color-text-brand)">
+          1 240 000 000 so'm
+        </div>
+        <p class="t-small t-muted">≈ 12 917 000 so'm / m²</p>
+      </div>
+
+      <!-- ---------- XUSUSIYATLAR ---------- -->
+      <section class="section" aria-labelledby="specTitle">
+        <h2 class="t-heading" id="specTitle" style="margin-bottom: var(--space-4)">Asosiy xususiyatlar</h2>
+        <dl class="spec-grid">
+          <div class="spec-cell"><dt>Xonalar</dt><dd>3</dd></div>
+          <div class="spec-cell"><dt>Maydoni</dt><dd>96 m²</dd></div>
+          <div class="spec-cell"><dt>Qavat</dt><dd>4 / 9</dd></div>
+          <div class="spec-cell"><dt>Qurilgan yili</dt><dd>2023</dd></div>
+          <div class="spec-cell"><dt>Sanuzel</dt><dd>2</dd></div>
+          <div class="spec-cell"><dt>Holati</dt><dd>Ta'mirli</dd></div>
+        </dl>
+      </section>
+
+      <!-- ---------- ISHONCH TILI: TIZIM HISOBLADI (NFR-UX-20) ---------- -->
+      <section class="section" aria-labelledby="poiTitle">
+        <div class="trust-head">
+          <h2 class="t-heading" id="poiTitle">Yaqin-atrofdagi infratuzilma</h2>
+          <span class="badge badge-tour">⚙ Tizim hisobladi</span>
+        </div>
+        <p class="t-small t-muted" style="margin-bottom: var(--space-4)">
+          Masofalar OpenStreetMap ma'lumotlari asosida avtomatik hisoblangan.
+          <strong>Sotuvchi bu raqamlarni o'zgartira olmaydi.</strong>
+          To'g'ri chiziq bo'yicha, taxminiy.
+        </p>
+
+        <div>
+          <div class="poi-row">
+            <div class="poi-name"><span aria-hidden="true">🏫</span><span>36-son maktab</span></div>
+            <span class="data-computed">~280 m · 4 daq</span>
+          </div>
+          <div class="poi-row">
+            <div class="poi-name"><span aria-hidden="true">🧸</span><span>"Bolajon" bog'chasi</span></div>
+            <span class="data-computed">~410 m · 6 daq</span>
+          </div>
+          <div class="poi-row">
+            <div class="poi-name"><span aria-hidden="true">🛒</span><span>Korzinka Registon</span></div>
+            <span class="data-computed">~150 m · 2 daq</span>
+          </div>
+          <div class="poi-row">
+            <div class="poi-name"><span aria-hidden="true">🚌</span><span>Registon bekati</span></div>
+            <span class="data-computed">~190 m · 3 daq</span>
+          </div>
+          <div class="poi-row">
+            <div class="poi-name"><span aria-hidden="true">🏥</span><span>Shahar poliklinikasi</span></div>
+            <span class="data-computed">~860 m · 11 daq</span>
+          </div>
+          <div class="poi-row">
+            <div class="poi-name"><span aria-hidden="true">🏦</span><span>Ipoteka bank</span></div>
+            <span class="data-computed">~520 m · 7 daq</span>
+          </div>
+        </div>
+
+        <p class="t-caption" style="margin-top: var(--space-3)">
+          2 km radiusdagi obyektlar ko'rsatiladi. Har turdan eng yaqin 3 tasi.
+        </p>
+      </section>
+
+      <!-- ---------- ISHONCH TILI: SOTUVCHI KIRITDI ---------- -->
+      <section class="section" aria-labelledby="descTitle">
+        <div class="trust-head">
+          <h2 class="t-heading" id="descTitle">Sotuvchi tavsifi</h2>
+          <span class="badge badge-neutral">✎ Sotuvchi kiritgan</span>
+        </div>
+        <p class="data-claimed" style="font-size: var(--text-base); line-height: var(--leading-relaxed)">
+          Registon maydoniga piyoda yetib boradigan masofada, yangi qurilgan uyda shinam
+          3 xonali kvartira. Ta'mir to'liq tugallangan, oshxona jihozlari qoladi.
+          Uyning old tomoni tinch hovliga qaraydi. Hujjatlar tayyor, kadastr mavjud.
+        </p>
+      </section>
+
+      <!-- ---------- XARITA ---------- -->
+      <section class="section" aria-labelledby="mapTitle">
+        <h2 class="t-heading" id="mapTitle" style="margin-bottom: var(--space-4)">Xaritada joylashuvi</h2>
+        <div class="map-stub surface-immersive">
+          <div style="text-align:center">
+            <div style="font-size: var(--text-4xl)" aria-hidden="true">📍</div>
+            <div class="t-small">39.6547° N, 66.9597° E</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- =============== O'NG USTUN: SOTUVCHI =============== -->
+    <aside class="detail-aside">
+      <div class="card">
+        <div class="card-body">
+          <div class="cluster" style="gap: var(--space-3)">
+            <span class="avatar" aria-hidden="true">SB</span>
+            <div style="flex:1; min-width:0">
+              <div style="font-weight: var(--weight-semibold)">Samarqand Builders</div>
+              <div class="cluster" style="gap: var(--space-2)">
+                <span class="rating"><span class="rating-star" aria-hidden="true">★</span>4.8</span>
+                <span class="t-caption">· 34 ta e'lon</span>
+              </div>
+            </div>
+          </div>
+
+          <span class="badge badge-verified" style="align-self:flex-start">✓ Hujjatlari tekshirilgan</span>
+
+          <p class="t-caption">
+            Platformada 2024-yildan beri. Odatda 2 soat ichida javob beradi.
+          </p>
+
+          <div class="stack" style="gap: var(--space-2)">
+            <button class="btn btn-primary btn-block" id="chatBtn">Xabar yozish</button>
+            <button class="btn btn-secondary btn-block" id="phoneBtn">Telefon raqamini ko'rsatish</button>
+          </div>
+
+          <p class="t-caption" style="text-align:center">
+            Raqamni ko'rish uchun ro'yxatdan o'tish kerak
+          </p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top: var(--space-4)">
+        <div class="card-body">
+          <strong class="t-small">Xavfsizlik eslatmasi</strong>
+          <p class="t-caption">
+            Uyni ko'rmasdan turib oldindan to'lov qilmang. Shubhali e'lon haqida
+            bizga xabar bering.
+          </p>
+          <button class="btn btn-ghost btn-sm" style="align-self:flex-start">⚑ Shikoyat qilish</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<!-- ---------- STICKY CTA (mobil, thumb zone — NFR-UX-09) ---------- -->
+<div class="sticky-cta mobile-only">
+  <button class="btn btn-secondary btn-icon" aria-label="Saqlanganlarga qo'shish" aria-pressed="false" id="favBtn" style="flex:0 0 auto">♡</button>
+  <button class="btn btn-primary">Xabar yozish</button>
+</div>
+
+<nav class="bottom-nav" aria-label="Asosiy (mobil)">
+  <a class="bottom-nav-item" href="catalog.html"><span class="bottom-nav-icon" aria-hidden="true">🔍</span>Katalog</a>
+  <a class="bottom-nav-item" href="#"><span class="bottom-nav-icon" aria-hidden="true">🗺️</span>Xarita</a>
+  <a class="bottom-nav-item" href="post.html"><span class="bottom-nav-icon" aria-hidden="true">➕</span>E'lon</a>
+  <a class="bottom-nav-item" href="#"><span class="bottom-nav-icon" aria-hidden="true">♡</span>Saqlangan</a>
+  <a class="bottom-nav-item" href="#"><span class="bottom-nav-icon" aria-hidden="true">👤</span>Profil</a>
+</nav>
+
+<script type="module">
+  import { Toast, Theme } from '../src/components.js';
+
+  Theme.init();
+  document.getElementById('themeBtn').addEventListener('click', () => Theme.toggle());
+
+  // --- Panorama yuklanish simulyatsiyasi (TZ FR-TOUR-04) ---
+  const bar = document.getElementById('bar');
+  const pct = document.getElementById('pct');
+  const loading = document.getElementById('loading');
+  let p = 0;
+  const tick = setInterval(() => {
+    p = Math.min(100, p + 12);
+    bar.style.width = p + '%';
+    pct.textContent = p + '%';
+    if (p >= 100) { clearInterval(tick); loading.style.display = 'none'; }
+  }, 160);
+
+  // --- Xona almashtirish ---
+  const pano = document.getElementById('pano');
+  document.querySelectorAll('.room-thumb').forEach(t => t.addEventListener('click', () => {
+    document.querySelectorAll('.room-thumb').forEach(x => x.setAttribute('aria-current', 'false'));
+    t.setAttribute('aria-current', 'true');
+    pano.className = 'viewer-canvas ' + t.dataset.pano;
+    pano.setAttribute('aria-label', t.textContent.trim() + 'ning 360 gradusli panoramasi');
+  }));
+
+  // --- Avto-aylanish: holat IKONKA va aria-label bilan ko'rsatiladi (BUG-B11) ---
+  const rot = document.getElementById('rotateBtn');
+  rot.addEventListener('click', () => {
+    const on = rot.getAttribute('aria-pressed') === 'true';
+    rot.setAttribute('aria-pressed', String(!on));
+    rot.textContent = on ? '⏸' : '⟳';
+    rot.setAttribute('aria-label', on ? 'Avtomatik aylanish — o\'chirilgan' : 'Avtomatik aylanish — yoqilgan');
+  });
+
+  document.getElementById('chatBtn').addEventListener('click', () =>
+    Toast.info('Xabar yozish uchun ro\'yxatdan o\'ting', { title: 'Kirish kerak' }));
+
+  document.getElementById('phoneBtn').addEventListener('click', () =>
+    Toast.warning('Telefon raqami faqat ro\'yxatdan o\'tgan foydalanuvchilarga ko\'rinadi'));
+
+  document.getElementById('favBtn').addEventListener('click', e => {
+    const on = e.currentTarget.getAttribute('aria-pressed') === 'true';
+    e.currentTarget.setAttribute('aria-pressed', String(!on));
+    e.currentTarget.textContent = on ? '♡' : '♥';
+    Toast.success(on ? 'Saqlanganlardan olindi' : 'Saqlanganlarga qo\'shildi');
+  });
+</script>
+</body>
+</html>
