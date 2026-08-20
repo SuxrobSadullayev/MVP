@@ -163,6 +163,12 @@ model Region {
   nameUzCyrl String @map("name_uz_cyrl")
   nameRu     String @map("name_ru")
 
+  /// TZ FR-CAT-08 — qidiruv taxalluslari.
+  /// Foydalanuvchi viloyat emas, MARKAZ SHAHAR nomini yozadi:
+  /// "Termiz" (Surxondaryo), "Нукус" (Qoraqalpogʻiston), "Bukhara" (Buxoro).
+  /// Seed dan oldin 13 ta markazdan 7 tasi topilmasdi.
+  searchAliases String[] @default([]) @map("search_aliases")
+
   /// Xarita markazi — hudud tanlanganda shu nuqtaga uchadi
   centerLat Decimal @map("center_lat") @db.Decimal(10, 7)
   centerLng Decimal @map("center_lng") @db.Decimal(10, 7)
@@ -175,6 +181,9 @@ model Region {
   users      User[]
 
   @@index([code])
+  @@index([nameUzLatn(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([nameUzCyrl(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([nameRu(ops: raw("gin_trgm_ops"))], type: Gin)
   @@map("regions")
 }
 
@@ -187,6 +196,9 @@ model District {
   nameUzCyrl String @map("name_uz_cyrl")
   nameRu     String @map("name_ru")
 
+  /// FR-CAT-08 — tuman uchun ham
+  searchAliases String[] @default([]) @map("search_aliases")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -195,6 +207,9 @@ model District {
 
   @@unique([regionId, code])
   @@index([regionId])
+  @@index([nameUzLatn(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([nameUzCyrl(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([nameRu(ops: raw("gin_trgm_ops"))], type: Gin)
   @@map("districts")
 }
 
@@ -285,6 +300,12 @@ model Property {
   lat Decimal @db.Decimal(10, 7)
   lng Decimal @db.Decimal(10, 7)
 
+  /// GENERATED ALWAYS — lat/lng dan avtomatik hisoblanadi (migratsiya SQL da).
+  /// Prisma Client bu maydonni o'qiy/yoza olmaydi; geo so'rovlar $queryRaw orqali.
+  /// Bu yerda E'LON QILINISHI SHART: aks holda har bir `migrate diff`
+  /// uni "ortiqcha ustun" deb hisoblab O'CHIRIB YUBORADI.
+  geom Unsupported("geography(Point, 4326)")? @default(dbgenerated())
+
   status PropertyStatus @default(draft)
   isVip  Boolean        @default(false) @map("is_vip")
 
@@ -315,6 +336,10 @@ model Property {
   @@index([status, createdAt(sort: Desc)])
   @@index([status, price])
   @@index([sellerId])
+  // Geo va matn indekslari — sxemada e'lon qilinmasa Prisma ularni o'chiradi
+  @@index([geom], type: Gist)
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([address(ops: raw("gin_trgm_ops"))], type: Gin)
   @@map("properties")
 }
 
@@ -386,6 +411,9 @@ model Poi {
   lat Decimal @db.Decimal(10, 7)
   lng Decimal @db.Decimal(10, 7)
 
+  /// GENERATED ALWAYS — Property.geom bilan bir xil sabab
+  geom Unsupported("geography(Point, 4326)")? @default(dbgenerated())
+
   cachedAt  DateTime @default(now()) @map("cached_at")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -393,6 +421,7 @@ model Poi {
   propertyPois PropertyPoi[]
 
   @@index([type])
+  @@index([geom], type: Gist)
   @@map("pois")
 }
 
