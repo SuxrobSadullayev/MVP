@@ -1,0 +1,25 @@
+{
+  "name": "@3ds/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Yagona sxema manbai — tiplar, Zod validatsiyasi, konstantalar (TZ DM-11)",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./constants": "./src/constants.ts",
+    "./schemas": "./src/schemas.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

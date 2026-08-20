@@ -1,0 +1,661 @@
+// ==========================================================================
+// 3DS HOME PLATFORM — MA'LUMOTLAR MODELI
+// --------------------------------------------------------------------------
+// TZ §5 ni amalga oshiradi. Qat'iy qoidalar:
+//   DM-05  Pul — Decimal(18,2). FLOAT TAQIQLANADI.
+//   DM-06  Har jadvalda createdAt / updatedAt
+//   DM-07  Barcha birlamchi kalitlar — UUID
+//   DM-08  Indekslar: (regionId, districtId, status), price, createdAt, geo
+//   DM-09  `rooms` (xonalar soni) va `panoramas` (360° rasmlar) — chalkashmasin
+//   DM-10  Soft delete — deletedAt
+//
+// Geo: lat/lng Decimal sifatida saqlanadi; PostGIS `geography` ustuni va
+// GiST indeksi migratsiya SQL da generated column orqali qo'shiladi
+// (packages/db/prisma/migrations/.../migration.sql).
+// ==========================================================================
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [postgis, uuidOssp(map: "uuid-ossp"), pg_trgm, unaccent]
+}
+
+// ==========================================================================
+// ENUM'LAR
+// ==========================================================================
+
+enum UserRole {
+  buyer
+  seller
+  moderator
+  admin
+}
+
+enum UserStatus {
+  active
+  blocked
+  pending_seller // sotuvchi bo'lish arizasi berilgan
+}
+
+enum Language {
+  uz
+  ru
+}
+
+/// TZ QAROR-4 — ijara MVP ga kiradi
+enum DealType {
+  sale
+  rent
+}
+
+enum PropertyCategory {
+  new_building // yangi inshoot
+  secondary // ikkilamchi bozor
+  cottage // hovli / kottedj
+  commercial
+}
+
+enum PropertyStatus {
+  draft
+  pending // moderatsiyada
+  approved // katalogda ko'rinadi
+  rejected
+  archived
+  sold
+}
+
+enum RentPeriod {
+  monthly
+  daily
+}
+
+enum PoiType {
+  school
+  kindergarten
+  university
+  hospital
+  pharmacy
+  supermarket
+  bazaar
+  bank
+  metro
+  bus_stop
+  park
+  fuel
+}
+
+enum MessageType {
+  text
+  image
+  file
+  system
+}
+
+/// TZ SEC-AI-01 — `reject` ATAYLAB YO'Q.
+/// AI e'lonni rad eta olmaydi, faqat tartiblaydi va belgilaydi.
+enum ModerationVerdict {
+  auto_approve
+  needs_review
+  flag
+}
+
+enum AiGenerationKind {
+  description
+  room_tag
+  alt_text
+}
+
+/// TZ NFR-UX-22 — AI natijasi tasdiqlanmaguncha chop etilmaydi
+enum AiGenerationStatus {
+  pending // .data-generated holati
+  accepted // sotuvchi tasdiqladi → .data-claimed ga aylandi
+  discarded
+}
+
+enum ModerationAction {
+  approve
+  reject
+  request_changes
+  restore
+}
+
+// --- v2.0 to'lov modeli (TZ QAROR-3: sxema hozirdan, kod keyin) -----------
+
+enum TransactionType {
+  topup
+  withdrawal
+  deposit_hold
+  deposit_release
+  deposit_refund
+  commission
+}
+
+enum TransactionStatus {
+  pending
+  succeeded
+  failed
+  reversed
+}
+
+enum DepositStatus {
+  held // eskrouda
+  released // sotuvchiga o'tkazildi
+  refunded // xaridorga qaytarildi
+  disputed
+}
+
+// ==========================================================================
+// HUDUDIY MA'LUMOTNOMA — TZ DM-01/02/03
+// Prototipdagi eng katta strukturaviy bloker shu yerda yopiladi.
+// ==========================================================================
+
+model Region {
+  id   Int    @id @default(autoincrement())
+  code String @unique // "toshkent-shahri"
+
+  /// Uchta yozuv — qidiruv normalizatsiyasi uchun (TZ FR-CAT-08)
+  nameUzLatn String @map("name_uz_latn")
+  nameUzCyrl String @map("name_uz_cyrl")
+  nameRu     String @map("name_ru")
+
+  /// Xarita markazi — hudud tanlanganda shu nuqtaga uchadi
+  centerLat Decimal @map("center_lat") @db.Decimal(10, 7)
+  centerLng Decimal @map("center_lng") @db.Decimal(10, 7)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  districts  District[]
+  properties Property[]
+  users      User[]
+
+  @@index([code])
+  @@map("regions")
+}
+
+model District {
+  id       Int    @id @default(autoincrement())
+  regionId Int    @map("region_id")
+  code     String
+
+  nameUzLatn String @map("name_uz_latn")
+  nameUzCyrl String @map("name_uz_cyrl")
+  nameRu     String @map("name_ru")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  region     Region     @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  properties Property[]
+
+  @@unique([regionId, code])
+  @@index([regionId])
+  @@map("districts")
+}
+
+// ==========================================================================
+// FOYDALANUVCHILAR
+// ==========================================================================
+
+model User {
+  id String @id @default(uuid()) @db.Uuid
+
+  /// TZ FR-AUTH-01 — telefon + SMS OTP, parol yo'q
+  phone     String  @unique
+  name      String?
+  avatarUrl String? @map("avatar_url")
+
+  role     UserRole   @default(buyer)
+  status   UserStatus @default(active)
+  language Language   @default(uz)
+
+  regionId Int? @map("region_id")
+
+  /// TZ FR-POST-09 — sotuvchi o'zi o'rnata olmaydi, moderator beradi
+  isVerified Boolean   @default(false) @map("is_verified")
+  verifiedAt DateTime? @map("verified_at")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  region          Region?          @relation(fields: [regionId], references: [id], onDelete: SetNull)
+  properties      Property[]
+  favorites       Favorite[]
+  buyerChats      Chat[]           @relation("BuyerChats")
+  sellerChats     Chat[]           @relation("SellerChats")
+  messages        Message[]
+  wallet          Wallet?
+  buyerDeposits   Deposit[]        @relation("BuyerDeposits")
+  sellerDeposits  Deposit[]        @relation("SellerDeposits")
+  moderationLogs  ModerationLog[]
+  auditLogs       AuditLog[]
+  resolvedAiGens  AiGeneration[]
+
+  @@index([phone])
+  @@index([role, status])
+  @@map("users")
+}
+
+// ==========================================================================
+// E'LONLAR
+// ==========================================================================
+
+model Property {
+  id       String @id @default(uuid()) @db.Uuid
+  sellerId String @map("seller_id") @db.Uuid
+
+  title       String
+  description String? @db.Text
+
+  dealType DealType         @map("deal_type")
+  category PropertyCategory
+
+  /// TZ DM-05 — Decimal, FLOAT emas
+  price     Decimal @db.Decimal(18, 2)
+  /// TZ FR-POST-10 — kunlik CBU kursi bo'yicha, hisoblanган qiymat keshi
+  priceUsd  Decimal? @map("price_usd") @db.Decimal(18, 2)
+  currency  String  @default("UZS")
+
+  /// Ijara uchun qo'shimcha maydonlar (TZ FR-POST-15)
+  rentPeriod         RentPeriod? @map("rent_period")
+  depositRequired    Decimal?    @map("deposit_required") @db.Decimal(18, 2)
+  utilitiesIncluded  Boolean?    @map("utilities_included")
+
+  area Decimal @db.Decimal(10, 2)
+  /// DM-09: bu XONALAR SONI. 360° panoramalar — `panoramas` bog'lanishida.
+  rooms Int
+  /// TZ FR-POST-05 — prototipda YO'Q edi, 5/12 qotirilgan edi
+  floor       Int
+  totalFloors Int  @map("total_floors")
+  buildYear   Int? @map("build_year")
+  bathrooms   Int?
+
+  regionId   Int    @map("region_id")
+  districtId Int    @map("district_id")
+  address    String
+
+  /// TZ FR-POST-06 — majburiy, default YO'Q.
+  /// PostGIS `geom` ustuni migratsiyada shulardan generatsiya qilinadi.
+  lat Decimal @db.Decimal(10, 7)
+  lng Decimal @db.Decimal(10, 7)
+
+  status PropertyStatus @default(draft)
+  isVip  Boolean        @default(false) @map("is_vip")
+
+  viewCount    Int @default(0) @map("view_count")
+  /// TZ FR-MON-01 — MVP ning asosiy konversiya metrikasi
+  contactCount Int @default(0) @map("contact_count")
+
+  /// TZ FR-CAT-07 — "eng yangi" saralashi shu maydonga tayanadi
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  publishedAt DateTime? @map("published_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  seller        User             @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  region        Region           @relation(fields: [regionId], references: [id])
+  district      District         @relation(fields: [districtId], references: [id])
+  images        PropertyImage[]
+  panoramas     Panorama[]
+  propertyPois  PropertyPoi[]
+  favorites     Favorite[]
+  chats         Chat[]
+  deposits      Deposit[]
+  moderationLogs ModerationLog[]
+  aiGenerations AiGeneration[]
+
+  // TZ DM-08 — katalog so'rovlarining asosiy yo'llari
+  @@index([status, dealType, regionId, districtId])
+  @@index([status, createdAt(sort: Desc)])
+  @@index([status, price])
+  @@index([sellerId])
+  @@map("properties")
+}
+
+model PropertyImage {
+  id         String  @id @default(uuid()) @db.Uuid
+  propertyId String  @map("property_id") @db.Uuid
+  url        String
+  sortOrder  Int     @default(0) @map("sort_order")
+  isCover    Boolean @default(false) @map("is_cover")
+
+  /// TZ FR-AI-22 — AI yaratgan alt matni (uz + ru)
+  altUz String? @map("alt_uz")
+  altRu String? @map("alt_ru")
+
+  /// TZ FR-AI-03 — dublikat aniqlash uchun perceptual hash
+  phash String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  property    Property         @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  moderations MediaModeration[]
+
+  @@index([propertyId, sortOrder])
+  @@index([phash])
+  @@map("property_images")
+}
+
+/// DM-09 — 360° panoramalar. `Property.rooms` (son) bilan chalkashtirilmasin.
+model Panorama {
+  id         String @id @default(uuid()) @db.Uuid
+  propertyId String @map("property_id") @db.Uuid
+
+  url       String
+  /// TZ FR-AI-20 — AI taklif qiladi, sotuvchi o'zgartira oladi
+  roomName  String  @map("room_name")
+  roomTagAi String? @map("room_tag_ai")
+
+  width     Int?
+  height    Int?
+  sortOrder Int  @default(0) @map("sort_order")
+
+  phash String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  property    Property          @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  moderations MediaModeration[]
+
+  @@index([propertyId, sortOrder])
+  @@index([phash])
+  @@map("panoramas")
+}
+
+// ==========================================================================
+// INFRATUZILMA — TZ FR-MAP-02…09
+// Prototipda 13 ta qotirilgan Toshkent nuqtasi bor edi.
+// Endi OpenStreetMap Overpass API dan keshlanadi.
+// ==========================================================================
+
+model Poi {
+  id    String  @id @default(uuid()) @db.Uuid
+  osmId BigInt? @unique @map("osm_id")
+
+  type PoiType
+  name String
+
+  lat Decimal @db.Decimal(10, 7)
+  lng Decimal @db.Decimal(10, 7)
+
+  cachedAt  DateTime @default(now()) @map("cached_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  propertyPois PropertyPoi[]
+
+  @@index([type])
+  @@map("pois")
+}
+
+/// Hisoblangan masofa surati — TZ FR-MAP-09.
+/// Sotuvchi bu jadvalga yoza olmaydi. `.data-computed` shu yerdan keladi.
+model PropertyPoi {
+  propertyId String @map("property_id") @db.Uuid
+  poiId      String @map("poi_id") @db.Uuid
+
+  /// To'g'ri chiziq bo'yicha, metrda (Haversine). UI da "~" bilan ko'rsatiladi.
+  distanceM Int @map("distance_m")
+  /// distanceM / 80 (TZ FR-MAP-07)
+  walkMin   Int @map("walk_min")
+
+  computedAt DateTime @default(now()) @map("computed_at")
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  poi      Poi      @relation(fields: [poiId], references: [id], onDelete: Cascade)
+
+  @@id([propertyId, poiId])
+  @@index([propertyId, distanceM])
+  @@map("property_pois")
+}
+
+// ==========================================================================
+// SEVIMLILAR VA CHAT
+// ==========================================================================
+
+model Favorite {
+  userId     String   @map("user_id") @db.Uuid
+  propertyId String   @map("property_id") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@id([userId, propertyId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("favorites")
+}
+
+model Chat {
+  id         String @id @default(uuid()) @db.Uuid
+  propertyId String @map("property_id") @db.Uuid
+  buyerId    String @map("buyer_id") @db.Uuid
+  sellerId   String @map("seller_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  property Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  buyer    User      @relation("BuyerChats", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller   User      @relation("SellerChats", fields: [sellerId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  /// TZ FR-CHAT-04 — bitta e'lon bo'yicha bitta suhbat
+  @@unique([propertyId, buyerId])
+  @@index([buyerId, updatedAt(sort: Desc)])
+  @@index([sellerId, updatedAt(sort: Desc)])
+  @@map("chats")
+}
+
+model Message {
+  id       String @id @default(uuid()) @db.Uuid
+  chatId   String @map("chat_id") @db.Uuid
+  /// TZ FR-CHAT-01 — prototipda `sender: 'buyer'` QOTIRILGAN edi
+  senderId String @map("sender_id") @db.Uuid
+
+  type          MessageType @default(text)
+  body          String?     @db.Text
+  attachmentUrl String?     @map("attachment_url")
+
+  /// TZ FR-CHAT-05 — badge o'qilmagan sonini ko'rsatadi
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([chatId, createdAt])
+  @@index([chatId, readAt])
+  @@map("messages")
+}
+
+// ==========================================================================
+// AI QATLAMI — TZ §16
+// ==========================================================================
+
+/// TZ FR-AI-01…09. Diqqat: `verdict` da `reject` YO'Q (SEC-AI-01).
+model MediaModeration {
+  id String @id @default(uuid()) @db.Uuid
+
+  imageId    String? @map("image_id") @db.Uuid
+  panoramaId String? @map("panorama_id") @db.Uuid
+
+  verdict    ModerationVerdict
+  /// 0.00 – 1.00. Past bo'lsa kuchliroq modelga eskalatsiya (FR-AI-08)
+  confidence Decimal           @db.Decimal(4, 3)
+
+  /// Nima uchun shunday baholandi: blur / dark / not_360 / duplicate / faces …
+  reasons Json @default("[]")
+
+  /// Qaysi model baholadi — audit uchun
+  model String
+
+  /// FR-AI-03 — topilgan dublikat manbai
+  duplicateOfImageId    String? @map("duplicate_of_image_id") @db.Uuid
+  duplicateOfPanoramaId String? @map("duplicate_of_panorama_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  image    PropertyImage? @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  panorama Panorama?      @relation(fields: [panoramaId], references: [id], onDelete: Cascade)
+
+  @@index([verdict, createdAt])
+  @@index([imageId])
+  @@index([panoramaId])
+  @@map("media_moderations")
+}
+
+/// TZ FR-AI-10…16 + NFR-UX-22.
+/// `pending` — UI da `.data-generated` (uzuq chegara).
+/// `accepted` — sotuvchi tasdiqladi, javobgarlik unga o'tdi.
+model AiGeneration {
+  id         String @id @default(uuid()) @db.Uuid
+  propertyId String @map("property_id") @db.Uuid
+
+  kind   AiGenerationKind
+  status AiGenerationStatus @default(pending)
+
+  /// FR-AI-11 — ikkala til mustaqil yoziladi, tarjima emas
+  contentUz String? @map("content_uz") @db.Text
+  contentRu String? @map("content_ru") @db.Text
+
+  model      String
+  /// Xarajat kuzatuvi
+  inputTokens  Int? @map("input_tokens")
+  outputTokens Int? @map("output_tokens")
+
+  resolvedAt DateTime? @map("resolved_at")
+  resolvedBy String?   @map("resolved_by") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  resolver User?    @relation(fields: [resolvedBy], references: [id], onDelete: SetNull)
+
+  @@index([propertyId, kind, status])
+  @@map("ai_generations")
+}
+
+// ==========================================================================
+// MODERATSIYA VA AUDIT
+// ==========================================================================
+
+/// TZ FR-ADM-02/03/04 — sabab MAJBURIY, qaror qaytarilishi mumkin
+model ModerationLog {
+  id         String @id @default(uuid()) @db.Uuid
+  propertyId String @map("property_id") @db.Uuid
+  adminId    String @map("admin_id") @db.Uuid
+
+  action ModerationAction
+  /// FR-ADM-02 — rad etishda bo'sh bo'lishi mumkin emas (ilova darajasida)
+  reason String?          @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  admin    User     @relation(fields: [adminId], references: [id])
+
+  @@index([propertyId, createdAt(sort: Desc)])
+  @@index([adminId, createdAt(sort: Desc)])
+  @@map("moderation_logs")
+}
+
+/// TZ FR-ADM-06 / SEC — o'zgartirilmaydigan audit izi
+model AuditLog {
+  id      String  @id @default(uuid()) @db.Uuid
+  actorId String? @map("actor_id") @db.Uuid
+
+  action   String
+  entity   String
+  entityId String? @map("entity_id")
+
+  payload Json?
+  ip      String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+  @@index([actorId, createdAt(sort: Desc)])
+  @@map("audit_logs")
+}
+
+// ==========================================================================
+// TO'LOVLAR — v2.0 (TZ QAROR-3)
+// Kod v2.0 da yoziladi, LEKIN sxema hozirdan turadi:
+// keyinchalik ma'lumot migratsiyasi og'rig'i bo'lmasin.
+// ==========================================================================
+
+model Wallet {
+  /// DM-07 — birlamchi kalit UUID. `userId` alohida unique bog'lanish.
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @unique @map("user_id") @db.Uuid
+  /// DM-05 — Decimal. Balans SERVERDA hisoblanadi (FR-PAY-08).
+  balance   Decimal  @default(0) @db.Decimal(18, 2)
+  currency  String   @default("UZS")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@map("wallets")
+}
+
+model Transaction {
+  id       String @id @default(uuid()) @db.Uuid
+  walletId String @map("wallet_id") @db.Uuid
+
+  type   TransactionType
+  status TransactionStatus @default(pending)
+  amount Decimal           @db.Decimal(18, 2)
+
+  externalRef String? @map("external_ref")
+  /// TZ FR-PAY-04 — ikki marta bosish ikki marta yechmasin
+  idempotencyKey String? @unique @map("idempotency_key")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId, createdAt(sort: Desc)])
+  @@index([status])
+  @@map("transactions")
+}
+
+/// TZ FR-PAY-05 — eskrou. Prototipda pul shunchaki yo'q bo'lardi.
+model Deposit {
+  id         String @id @default(uuid()) @db.Uuid
+  propertyId String @map("property_id") @db.Uuid
+  buyerId    String @map("buyer_id") @db.Uuid
+  sellerId   String @map("seller_id") @db.Uuid
+
+  /// FR-PAY-02 — uy narxining foizi, qotirilgan summa emas
+  amount Decimal       @db.Decimal(18, 2)
+  status DepositStatus @default(held)
+
+  escrowReleasedAt DateTime? @map("escrow_released_at")
+  refundedAt       DateTime? @map("refunded_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  property Property @relation(fields: [propertyId], references: [id])
+  buyer    User     @relation("BuyerDeposits", fields: [buyerId], references: [id])
+  seller   User     @relation("SellerDeposits", fields: [sellerId], references: [id])
+
+  @@index([propertyId])
+  @@index([buyerId, createdAt(sort: Desc)])
+  @@index([status])
+  @@map("deposits")
+}

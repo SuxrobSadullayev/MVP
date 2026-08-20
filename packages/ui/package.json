@@ -1,0 +1,19 @@
+{
+  "name": "@3ds/ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Dizayn tizimi — tokenlar, base qatlam, komponentlar",
+  "type": "module",
+  "exports": {
+    "./tokens.css": "./src/tokens.css",
+    "./base.css": "./src/base.css",
+    "./components.css": "./src/components.css",
+    "./components.js": "./src/components.js",
+    "./tailwind-preset": "./tailwind.preset.js"
+  },
+  "files": ["src", "tailwind.preset.js"],
+  "scripts": {
+    "lint": "echo '(css lint keyingi bosqichda)'",
+    "typecheck": "echo '(vanilla JS — typecheck yo'\\''q)'"
+  }
+}

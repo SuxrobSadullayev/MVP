@@ -1,0 +1,31 @@
+{
+  "name": "3ds-home-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "360° virtual tur asosidagi ko'chmas mulk marketplace — butun O'zbekiston uchun",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "db:up": "docker compose up -d postgres redis minio",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f postgres",
+    "db:migrate": "npm run migrate --workspace=@3ds/db",
+    "db:seed": "npm run seed --workspace=@3ds/db",
+    "db:studio": "npm run studio --workspace=@3ds/db",
+    "db:reset": "npm run reset --workspace=@3ds/db"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  }
+}
