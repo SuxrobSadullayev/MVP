@@ -22,10 +22,13 @@
     "db:migrate": "npm run migrate --workspace=@3ds/db",
     "db:seed": "npm run seed --workspace=@3ds/db",
     "db:studio": "npm run studio --workspace=@3ds/db",
-    "db:reset": "npm run reset --workspace=@3ds/db"
+    "db:reset": "npm run reset --workspace=@3ds/db",
+    "guard": "node scripts/guard-migrations.mjs && node scripts/guard-asset-links.mjs",
+    "check": "npm run guard && npm run typecheck && npm run test"
   },
   "devDependencies": {
     "turbo": "^2.3.3",
     "typescript": "^5.7.2"
-  }
+  },
+  "packageManager": "npm@12.0.2"
 }

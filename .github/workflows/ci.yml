@@ -1,0 +1,136 @@
+# ==========================================================================
+# CI — TZ NFR-OPS-01/04
+# --------------------------------------------------------------------------
+# Prototip buzuq holda commit qilingan va hech narsa buni aniqlamagan:
+# `src/style.css` ga havola bor edi, fayl esa yo'q edi.
+# Shuning uchun bu yerda kod sifatidan tashqari ikkita HIMOYA ham bor.
+# ==========================================================================
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  # ------------------------------------------------------------------------
+  # Himoyalar — eng tez yiqiladigan tekshiruvlar birinchi
+  # ------------------------------------------------------------------------
+  guards:
+    name: Himoyalar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Geo qatlami o'chirilmaganini tekshirish
+        run: node scripts/guard-migrations.mjs
+
+      - name: Yo'q faylga havola yo'qligini tekshirish
+        run: node scripts/guard-asset-links.mjs
+
+  # ------------------------------------------------------------------------
+  # Kod sifati
+  # ------------------------------------------------------------------------
+  quality:
+    name: Typecheck va testlar
+    runs-on: ubuntu-latest
+    needs: guards
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Prisma client
+        run: npm run generate --workspace=@3ds/db
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Testlar
+        run: npm run test
+
+  # ------------------------------------------------------------------------
+  # Ma'lumotlar bazasi — migratsiya va seed HAQIQATAN ishlashini tekshirish
+  # Sxema to'g'ri deb aytish yetarli emas; u qo'llanishi kerak.
+  # ------------------------------------------------------------------------
+  database:
+    name: Migratsiya va seed
+    runs-on: ubuntu-latest
+    needs: guards
+
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: ci_3ds
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci_3ds"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci_3ds?schema=public
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci
+      - run: npm run generate --workspace=@3ds/db
+
+      - name: Migratsiyalarni qo'llash
+        working-directory: packages/db
+        run: npx prisma migrate deploy
+
+      - name: Seed
+        working-directory: packages/db
+        run: npx tsx prisma/seed.ts
+
+      - name: Geo qatlami haqiqatan yaratilganini tekshirish
+        run: |
+          PSQL="psql $DATABASE_URL -tAc"
+          GEOM=$($PSQL "SELECT count(*) FROM geography_columns;")
+          GIST=$($PSQL "SELECT count(*) FROM pg_indexes WHERE schemaname='public' AND indexdef LIKE '%USING gist%';")
+          CHECKS=$($PSQL "SELECT count(*) FROM pg_constraint WHERE contype='c' AND connamespace='public'::regnamespace;")
+          echo "geom ustunlari: $GEOM (2 kutilgan)"
+          echo "GiST indekslari: $GIST (2 kutilgan)"
+          echo "CHECK cheklovlari: $CHECKS (>=8 kutilgan)"
+          [ "$GEOM" -eq 2 ] || { echo "❌ geom ustunlari yo'q"; exit 1; }
+          [ "$GIST" -eq 2 ] || { echo "❌ GiST indekslari yo'q"; exit 1; }
+          [ "$CHECKS" -ge 8 ] || { echo "❌ CHECK cheklovlari yetishmayapti"; exit 1; }
+
+      - name: Cheklovlar yomon ma'lumotni bloklashini tekshirish
+        run: |
+          # Manfiy narx qabul qilinmasligi SHART.
+          # Agar bu INSERT o'tsa — cheklov ishlamayapti, CI yiqilishi kerak.
+          if psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c \
+            "INSERT INTO properties (id,seller_id,title,deal_type,category,price,area,rooms,floor,total_floors,region_id,district_id,address,lat,lng,status,updated_at)
+             VALUES (gen_random_uuid(),gen_random_uuid(),'x','sale','secondary',-1,60,3,4,9,1,1,'a',41.3,69.2,'draft',now());" 2>/dev/null; then
+            echo "❌ Manfiy narx qabul qilindi — cheklov ishlamayapti"
+            exit 1
+          fi
+          echo "✅ Manfiy narx bloklandi"
