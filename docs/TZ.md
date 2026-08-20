@@ -2,7 +2,7 @@
 
 **Loyiha:** 3DS Home Platform — 360° Virtual Tur asosidagi ko'chmas mulk marketplace
 **Hudud:** Butun O'zbekiston Respublikasi (14 ta ma'muriy hudud)
-**Hujjat versiyasi:** 1.1
+**Hujjat versiyasi:** 1.2
 **Sana:** 2026-08-20
 **Buyurtmachi:** Suxrob Sadullayev
 **Holat:** Arxitektura qarorlari qabul qilindi (§15)
@@ -804,6 +804,104 @@ Prototip auditida topilgan **50 ta kamchilikning barchasi** shu TZ ga kiritildi:
 | `deal_type` | Keyin qo'shish = DB migratsiyasi + barcha filtrlar | ✅ Hozir |
 | i18n | Keyin qo'shish = har bir satrni ko'rib chiqish | ✅ Hozir |
 | To'lovlar | Keyin qo'shish = **sxema tayyor bo'lsa arzon** | ⏸️ v2.0 |
+
+---
+
+## 16. AI QATLAMI
+
+> **Asosiy prinsip:** AI — **ko'rinmas infratuzilma**, marketing hikoyasi emas.
+> Mahsulotning farqlovchi taklifi "360° tur + o'lchangan masofa = ishonch" bo'lib qoladi.
+> "AI-powered" degan yorliq bu aniq va tekshirib bo'ladigan taklifni suyultiradi.
+
+### 16.1 Ikkita buzilmas qoida
+
+| № | Qoida | Sabab |
+|---|---|---|
+| **SEC-AI-01** 🔴 | **AI e'lonni rad eta olmaydi.** U faqat tartiblaydi va belgilaydi; yakuniy qaror — moderatorda | Noto'g'ri avtomatik rad etish = jahli chiqqan sotuvchi = yo'qolgan taklif |
+| **SEC-AI-02** 🔴 | **AI chiqargan har qanday kontent belgilanadi** va foydalanuvchiga ko'rinadi | Yashirin AI kontenti — ishonchga qurilgan mahsulot uchun ikkiyuzlamachilik |
+
+### 16.2 Uchinchi ishonch toifasi
+
+Dizayn tizimida ikkita toifa bor edi. AI uchinchisini talab qiladi:
+
+| Klass | Ma'nosi | Ko'rinishi |
+|---|---|---|
+| `.data-computed` | Tizim o'lchadi (POI masofasi) | Brend rangli |
+| `.data-claimed` | Sotuvchi yozdi | Neytral |
+| **`.data-generated`** 🆕 | **AI tayyorladi, sotuvchi hali tasdiqlamadi** | **Oltin ramka + "AI tayyorladi" yorlig'i** |
+
+> **NFR-UX-22** 🔴 — AI tayyorlagan kontent **hech qachon to'g'ridan-to'g'ri chop etilmaydi**.
+> Oqim: AI yozadi → sotuvchi ko'radi va tahrirlaydi → tasdiqlaydi → `.data-claimed` ga aylanadi
+> (javobgarlik sotuvchiga o'tadi).
+
+### 16.3 FR-AI-01…09 · Media moderatsiyasi (vision)
+
+> Bu — majburiy panorama qoidasini (`FR-POST-03`) operatsion jihatdan mumkin qiladigan qism.
+> **Busiz 14 hududga chiqib bo'lmaydi.**
+
+| ID | Prio | Talab |
+|---|:--:|---|
+| **FR-AI-01** | 🔴 | Yuklangan rasm **haqiqatan equirectangular 360°** ekanini tekshirish (2:1 nisbat + chekka uzluksizligi) |
+| **FR-AI-02** | 🔴 | Sifat nazorati: xiralik, qorong'ilik, kadr to'sib qo'yilgani |
+| **FR-AI-03** | 🔴 | **Dublikat / o'g'irlangan e'lon aniqlash** — perceptual hash + vision embedding. O'zbekiston bozorida e'lonlar ko'p nusxalanadi |
+| **FR-AI-04** | 🔴 | Nomaqbul kontent aniqlash |
+| **FR-AI-05** | 🔴 | **Maxfiylik: yuz va avtomobil raqamlarini avtomatik xiralashtirish** |
+| **FR-AI-06** | 🔴 | Natija — **strukturaviy JSON** (`output_config.format`), erkin matn emas |
+| **FR-AI-07** | 🔴 | **[← SEC-AI-01]** Chiqish: `auto_approve` / `needs_review` / `flag` + ishonch darajasi + sabab. **`reject` yo'q** |
+| **FR-AI-08** | 🟠 | Ishonch past bo'lsa — kuchliroq modelga eskalatsiya |
+| **FR-AI-09** | 🟠 | Navbat orqali asinxron (`apps/worker`), yuklashni bloklamaydi |
+
+### 16.4 FR-AI-10…16 · Tavsif yaratish (uz + ru)
+
+> Majburiy panorama qo'shgan friksiyani qoplaydi va bir vaqtda **SEO** hamda **rus tili** muammosini hal qiladi.
+
+| ID | Prio | Talab |
+|---|:--:|---|
+| **FR-AI-10** | 🔴 | Strukturaviy ma'lumot + hisoblangan POI dan tavsif yaratish |
+| **FR-AI-11** | 🔴 | **uz va ru — ikkalasi mustaqil yoziladi**, tarjima emas |
+| **FR-AI-12** | 🔴 | **[← NFR-UX-22]** Natija `.data-generated` holatida ko'rsatiladi, sotuvchi tasdiqlagunicha chop etilmaydi |
+| **FR-AI-13** | 🔴 | **AI faqat tizimda mavjud faktlardan foydalanadi.** Mavjud bo'lmagan xususiyat o'ylab topilmaydi (masalan "yaqinda metro bor" — agar POI da yo'q bo'lsa) |
+| **FR-AI-14** | 🔴 | **⚠️ O'zbek tili sifati rus tilidan pastroq** — shuning uchun sotuvchi tasdig'i majburiy |
+| **FR-AI-15** | 🟠 | Prompt caching — ko'rsatmalar prefiksi keshlanadi |
+| **FR-AI-16** | 🟠 | SEO: har bir e'lon uchun noyob `meta description` ham shu chaqiruvda |
+
+### 16.5 FR-AI-20…23 · Xona teglash va alt-matn
+
+> Deyarli bepul: **16.3 dagi vision chaqiruvi bilan bir xil so'rovda** bajariladi.
+
+| ID | Prio | Talab |
+|---|:--:|---|
+| **FR-AI-20** | 🟠 | Panoramadan xona turi aniqlanadi (yotoqxona / oshxona / mehmonxona / hammom / balkon) |
+| **FR-AI-21** | 🟠 | Sotuvchi taklif qilingan tegni o'zgartira oladi |
+| **FR-AI-22** | 🟠 | **[← NFR-A11Y-04]** Har bir rasm uchun `alt` matni avtomatik yaratiladi (uz + ru) |
+| **FR-AI-23** | 🟡 | Ta'mir holati bahosi (yangi / ta'mirli / ta'mir talab qiladi) — sotuvchi tasdig'i bilan |
+
+### 16.6 Model tanlovi va xarajat
+
+| Vazifa | Model | Sabab |
+|---|---|---|
+| Moderatsiya — birlamchi saralash | **Haiku 4.5** (`claude-haiku-4-5`) | Arzon, tez, katta hajm uchun |
+| Moderatsiya — shubhali holatlar | **Opus 5** (`claude-opus-5`) | Faqat ishonch past bo'lganda (~10%) |
+| Tavsif yaratish (uz + ru) | **Sonnet 5** (`claude-sonnet-5`) | Ko'p tilli sifat / narx muvozanati |
+
+**Optimizatsiya:** moderatsiya navbati **Batch API** orqali (−50%), tavsif yaratishda **prompt caching**.
+
+**Hisoblangan xarajat:**
+
+| Miqyos | Moderatsiya | Tavsif | Jami |
+|---|---|---|---|
+| MVP (800 rasm, 200 e'lon / oy) | ~$4 | ~$2 | **~$6 / oy** |
+| 10× (40 000 rasm, 10 000 e'lon / oy) | ~$150 | ~$92 | **~$242 / oy** |
+
+> Xulosa: AI qatlami **xarajat to'sig'i emas**. Yagona mezon — MVP gipotezasiga xizmat qiladimi.
+
+### 16.7 v1 ga KIRMAYDIGAN AI
+
+| Nima | Nima uchun yo'q |
+|---|---|
+| ❌ **Narx bahosi** | MVP da ~500 e'lon, 14 hududga taqsimlangan — model uchun yetarli emas. **Yomon narx bahosi ishonchni buzadi**, ya'ni mahsulotning maqsadiga qarshi ishlaydi. Ma'lumot to'plangach v2.0 da |
+| ❌ **Chatda avtomatik javob** | Sotuvchi tasdiqlamagan da'vo — huquqiy va ishonch muammosi. Uy haqidagi ma'lumot faqat egasidan chiqadi |
+| ❌ **"AI yordamchi" chatbot** | Foydalanuvchi ehtiyoji yo'q. Faqat "bizda ham AI bor" deyish uchun qo'shiladigan narsa |
 
 ---
 

@@ -255,6 +255,37 @@
       <section class="section-card" aria-labelledby="s5">
         <h2 id="s5">Tavsif</h2>
         <p class="lead">Xaridor uchun muhim tafsilotlar: hujjatlar, ta'mir, qo'shnilar.</p>
+
+        <!-- ---- AI TAVSIF — TZ §16.4, uchinchi ishonch toifasi ---- -->
+        <div class="cluster" style="gap: var(--space-2); margin-bottom: var(--space-4)">
+          <button type="button" class="btn btn-secondary btn-sm" id="genBtn">
+            ✨ Tavsifni men uchun yozib bering
+          </button>
+          <span class="t-caption">O'zbek va rus tilida · tekshirib tasdiqlaysiz</span>
+        </div>
+
+        <!-- AI natijasi — tasdiqlanmaguncha shu holatda turadi -->
+        <div id="genResult" hidden style="margin-bottom: var(--space-4)">
+          <div class="data-generated" data-label="AI tayyorladi — tasdiqlanmagan">
+            <p id="genText" style="margin:0">
+              Registon maydoniga piyoda yetib boradigan masofada joylashgan 3 xonali,
+              96 m² kvartira. To'rtinchi qavat, 2023-yilda qurilgan uy.
+              Eng yaqin maktab 280 metrda, supermarket 150 metrda.
+            </p>
+            <div class="generated-actions">
+              <button type="button" class="btn btn-primary btn-sm" id="acceptGen">
+                Tasdiqlash va tahrirlashga o'tkazish
+              </button>
+              <button type="button" class="btn btn-ghost btn-sm" id="regenGen">Qayta yozish</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="discardGen">Bekor qilish</button>
+            </div>
+          </div>
+          <p class="t-caption" style="margin-top: var(--space-2)">
+            Tizim faqat siz kiritgan ma'lumot va hisoblangan masofalardan foydalanadi —
+            mavjud bo'lmagan xususiyatni o'ylab topmaydi.
+          </p>
+        </div>
+
         <div class="field">
           <label class="field-label" for="desc">Qo'shimcha ma'lumot</label>
           <textarea class="input" id="desc" rows="5" maxlength="2000"
@@ -315,8 +346,36 @@
 
   // Belgilar hisoblagichi
   const desc = document.getElementById('desc');
-  desc.addEventListener('input', () => {
-    desc.nextElementSibling.textContent = `${desc.value.length} / 2000`;
+  const countHint = () => { desc.nextElementSibling.textContent = `${desc.value.length} / 2000`; };
+  desc.addEventListener('input', countHint);
+
+  // --- AI tavsif oqimi (TZ §16.4 / NFR-UX-22) ---
+  // AI natijasi HECH QACHON to'g'ridan-to'g'ri chop etilmaydi:
+  // tayyorlanadi → sotuvchi ko'radi → tasdiqlaydi → tahrirlanadigan matnga aylanadi.
+  const genBtn = document.getElementById('genBtn');
+  const genResult = document.getElementById('genResult');
+  const genText = document.getElementById('genText');
+
+  const generate = guardSubmit(genBtn, async () => {
+    await new Promise(r => setTimeout(r, 900));
+    genResult.hidden = false;
+    Toast.info('Tekshirib chiqing va tasdiqlang', { title: 'Tavsif tayyorlandi' });
+  });
+  genBtn.addEventListener('click', () => generate());
+
+  document.getElementById('acceptGen').addEventListener('click', () => {
+    // Tasdiqlangach javobgarlik sotuvchiga o'tadi — .data-generated holati tugaydi
+    desc.value = genText.textContent.trim().replace(/\s+/g, ' ');
+    countHint();
+    genResult.hidden = true;
+    desc.focus();
+    Toast.success('Endi uni o\'zingiz tahrirlashingiz mumkin', { title: 'Tavsif qabul qilindi' });
+  });
+
+  document.getElementById('regenGen').addEventListener('click', () => generate());
+  document.getElementById('discardGen').addEventListener('click', () => {
+    genResult.hidden = true;
+    Toast.info('Tavsifni o\'zingiz yozishingiz mumkin');
   });
 
   // Yuborish — bir martalik himoya (FR-PAY-04 naqshi)

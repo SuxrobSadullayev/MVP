@@ -246,6 +246,12 @@
   --color-trust-claimed-text:  var(--p-slate-600);  /* sotuvchi kiritgan */
   --color-trust-claimed-bg:    var(--p-slate-100);
 
+  /* AI tayyorladi, sotuvchi HALI TASDIQLAMAGAN — TZ §16.2, NFR-UX-22.
+     Chegara uzuq: "vaqtinchalik, tasdiq kutmoqda" signali. */
+  --color-generated-text:   var(--p-gold-800);   /* tint fonda 6.15 ✅ */
+  --color-generated-bg:     var(--p-gold-100);
+  --color-generated-border: var(--p-gold-600);
+
   --color-vip-text: var(--p-gold-800);   /* tint 6.15 ✅ */
   --color-vip-bg:   var(--p-gold-100);
   --color-vip-icon: var(--p-gold-600);  /* grafik, WCAG 1.4.11: 3.04 ✅ */
@@ -319,6 +325,10 @@
   --color-trust-claimed-text:  var(--p-slate-300);
   --color-trust-claimed-bg:    var(--p-slate-800);
 
+  --color-generated-text:   var(--p-gold-400);   /* tint fonda 5.43 ✅ */
+  --color-generated-bg:     var(--p-gold-900);
+  --color-generated-border: var(--p-gold-400);
+
   --color-vip-text: var(--p-gold-400);  /* 10.69:1 AAA */
   --color-vip-bg:   var(--p-gold-900);
   --color-vip-icon: var(--p-gold-400);
@@ -386,6 +396,10 @@
     --color-trust-computed-bg:   var(--p-brand-950);
     --color-trust-claimed-text:  var(--p-slate-300);
     --color-trust-claimed-bg:    var(--p-slate-800);
+
+    --color-generated-text:   var(--p-gold-400);
+    --color-generated-bg:     var(--p-gold-900);
+    --color-generated-border: var(--p-gold-400);
 
     --color-vip-text: var(--p-gold-400);
     --color-vip-bg:   var(--p-gold-900);

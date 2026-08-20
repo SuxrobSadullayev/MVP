@@ -1,6 +1,6 @@
 # 🎨 DIZAYN TIZIMI — 3DS Home Platform
 
-**Versiya:** 1.0 · **Sana:** 2026-08-20
+**Versiya:** 1.1 · **Sana:** 2026-08-20
 **Kod:** [`packages/ui/src/tokens.css`](../packages/ui/src/tokens.css) · [`packages/ui/src/base.css`](../packages/ui/src/base.css)
 **Jonli styleguide:** [`packages/ui/styleguide.html`](../packages/ui/styleguide.html)
 
@@ -166,8 +166,16 @@ Bu bo'lim dizayn tizimini **shu mahsulotga xos** qiladi. Foydalanuvchi bir qaras
 
 | Klass | Ma'nosi | Ko'rinishi |
 |---|---|---|
-| `.data-computed` | Tizim hisobladi — POI masofasi, koordinata | Brend rangli, tabular raqam |
-| `.data-claimed` | Sotuvchi kiritdi — tavsif, sarlavha | Neytral |
+| `.data-computed` | Tizim **o'lchadi** — POI masofasi, koordinata | Brend rangli, tabular raqam |
+| `.data-claimed` | Sotuvchi **yozdi** — tavsif, sarlavha | Neytral |
+| `.data-generated` | AI **tayyorladi**, sotuvchi hali tasdiqlamagan | Oltin, **uzuq chegara** + "AI tayyorladi" yorlig'i |
+
+Uchinchi toifa AI qatlami (TZ §16) bilan paydo bo'ldi. AI natijasi na o'lchov, na
+sotuvchi da'vosi — **oraliq holat**. Uzuq chegara aynan shuni bildiradi:
+"vaqtinchalik, tasdiq kutmoqda".
+
+Oqim: AI yozadi → sotuvchi ko'radi va tahrirlaydi → tasdiqlaydi → `.data-claimed`
+ga aylanadi, ya'ni **javobgarlik sotuvchiga o'tadi** (TZ `NFR-UX-22`).
 
 Bu TZ **FR-MAP-09** ("POI faqat tizim tomonidan hisoblanadi, sotuvchi tahrirlay olmaydi") ning vizual ifodasi. Qoida backendda majburlanadi, dizaynda **ko'rinadigan** qilinadi.
 
@@ -192,45 +200,54 @@ Har bir yangi komponent shundan o'tadi:
 
 ## 9. TZ BILAN SOLISHTIRISH
 
+TZ §6 (Track 1 — UX/UI) da **29 ta talab** bor (§6 ning asl 25 tasi + dizayn
+jarayonida qo'shilgan NFR-UX-17…22).
+
 ### 9.1 §6.1 Dizayn tizimi
 
 | TZ ID | Talab | Holat |
 |---|---|---|
 | NFR-UX-01 | Dizayn tizimi kod bazasida | ✅ `packages/ui` |
-| NFR-UX-02 | Rang/shrift/spacing/radius/shadow — token | ✅ |
+| NFR-UX-02 | Rang/shrift/spacing/radius/soya — token | ✅ 3 qatlamli |
 | NFR-UX-03 | 8px grid | ✅ |
 | NFR-UX-04 | Maksimum 2 shrift oilasi | ✅ 1 ta (qat'iyroq) |
-| NFR-UX-05 | Barcha komponent holatlari | ⚠️ Tugma/input/kartochka ✅ · qolgan komponentlar hali yo'q |
-| NFR-UX-06 | Light va dark | ✅ |
+| NFR-UX-05 | Barcha komponent holatlari | ✅ Tugma, input, kartochka, chip, switch, toast, modal |
+| NFR-UX-06 | Light + dark, light sukut bo'yicha | ✅ |
+| NFR-UX-17 | Kontrast render qilingan sahifada o'lchanadi | ✅ Har ekranda o'tkazildi |
+| NFR-UX-18 | Shrift kirillni qo'llashi shart | ✅ Inter Variable |
+| NFR-UX-19 | Immersiv sirtlar doim qorong'i | ✅ `.surface-immersive` |
+| NFR-UX-20 | "Hisoblangan" ≠ "kiritilgan" vizual farq | ✅ `.data-computed` / `.data-claimed` |
+| NFR-UX-21 | Ichki standart ≥ 5.0 | ✅ Eng past 5.06 |
+| NFR-UX-22 | AI kontenti tasdiqlanmaguncha ajratiladi | ✅ `.data-generated` |
 
 ### 9.2 §6.2 Mobil
 
 | TZ ID | Talab | Holat |
 |---|---|---|
-| NFR-UX-07 | Mobile-first | ✅ Grid `auto-fill`, media query'siz moslashadi |
-| NFR-UX-08 | ≥ 44×44 px | ✅ `--tap-min` |
-| NFR-UX-09 | CTA thumb-zone da | ❌ Ekran maketi darajasi — keyingi bosqich |
-| NFR-UX-10 | Input turlari (`tel`, `email`) | ❌ Ekran darajasi |
-| NFR-UX-11 | Bottom navigation | ❌ Ekran darajasi |
+| NFR-UX-07 | Mobile-first | ✅ `auto-fill` grid, media query'siz |
+| NFR-UX-08 | ≥ 44×44 px | ✅ `--tap-min` + `pointer: coarse` qoidasi |
+| NFR-UX-09 | CTA thumb-zone da | ✅ `.sticky-cta` + bottom nav |
+| NFR-UX-10 | To'g'ri input turlari | ✅ `inputmode`, `enterkeyhint`, `type` |
+| NFR-UX-11 | Bottom navigation | ✅ `.bottom-nav` |
 
 ### 9.3 §6.3 Feedback
 
 | TZ ID | Talab | Holat |
 |---|---|---|
-| NFR-UX-12 | Toast navbat bilan | ❌ JS komponent — hali yo'q |
-| NFR-UX-13 | Faol navigatsiya holati | ❌ Ekran darajasi |
-| NFR-UX-14 | Loading holati | ⚠️ Skeleton + tugma loading ✅ · qolgani yo'q |
+| NFR-UX-12 | Toast navbat bilan | ✅ Har biri mustaqil element va taymer |
+| NFR-UX-13 | Faol navigatsiya holati | ✅ `aria-current` + ostki chiziq |
+| NFR-UX-14 | Loading holati | ✅ Skeleton, tugma loading, panorama progress |
 | NFR-UX-15 | Empty state | ✅ |
-| NFR-UX-16 | 404 / 500 sahifalari | ❌ Hali yo'q |
+| NFR-UX-16 | 404 / 500 sahifalari | ✅ `screens/error.html` |
 
 ### 9.4 §6.4 Accessibility
 
 | TZ ID | Talab | Holat |
 |---|---|---|
-| NFR-A11Y-01 | Kontrast ≥ 4.5:1 | ✅ **O'lchandi** — 46/46, eng past 5.06 |
+| NFR-A11Y-01 | Kontrast ≥ 4.5:1 | ✅ **O'lchandi** — 4 ekran × 2 mavzu, 0 yiqilish |
 | NFR-A11Y-02 | Tab + focus indikatori | ✅ `:focus-visible` |
-| NFR-A11Y-03 | Modal Esc + focus trap | ❌ JS komponent — hali yo'q |
-| NFR-A11Y-04 | `alt`, `aria-label` | ⚠️ Konvensiya belgilandi, majburlanmagan |
+| NFR-A11Y-03 | Modal Esc + focus trap + fokus qaytishi | ✅ `Modal` klassi |
+| NFR-A11Y-04 | `alt`, `aria-label` | ✅ Ikonkali tugmalar tekshirildi — 0 ta labelsiz |
 | NFR-A11Y-05 | Xato `role="alert"` | ✅ |
 | NFR-A11Y-06 | `prefers-reduced-motion` | ✅ |
 
@@ -238,30 +255,60 @@ Har bir yangi komponent shundan o'tadi:
 
 | TZ ID | Talab | Holat |
 |---|---|---|
-| NFR-I18N-01/02 | uz + ru, tarjima fayllari | ❌ Hali yo'q |
-| NFR-CNT-01/02/03 | CTA, xato, placeholder sifati | ⚠️ Prinsip ko'rsatildi, amalga oshirilmagan |
+| NFR-CNT-01/02/03 | CTA, xato, placeholder sifati | ✅ Ekranlarda amalga oshirildi |
+| NFR-I18N-01/02 | uz + ru tarjima fayllari | ❌ **Next.js o'rnatilgandan keyin** |
 
 ### 9.6 Xulosa
 
 ```
-✅ To'liq bajarildi:      12 ta talab
-⚠️ Qisman:                 4 ta talab
-❌ Hali boshlanmagan:      9 ta talab  (ekran maketi va JS komponentlar darajasi)
+✅ Bajarildi:            27 / 29
+❌ Frontend poydevorini kutmoqda:  2  (NFR-I18N-01/02)
 ```
 
-**Bajarilgani — poydevor** (§6.1 to'liq, §6.4 asosiy qismi).
-**Bajarilmagani — ekran va komponent darajasi**, u keyingi qadam.
+**Dizayn qatlami tugallandi.** Qolgan ikkita talab — `next-intl` o'rnatilishini
+talab qiladi, ya'ni 2-bosqich (Frontend yadro) ishi.
 
 ---
 
-## 10. TZ GA QO'SHILISHI KERAK BO'LGAN YANGI TALABLAR
+## 10. YETKAZILGAN FAYLLAR
 
-Dizayn jarayonida TZ da yo'q, lekin zarur ekani aniqlangan talablar:
+```
+packages/ui/
+├── src/
+│   ├── tokens.css        3 qatlamli token arxitekturasi, 2 mavzu + immersiv
+│   ├── base.css          reset, tipografiya, tugma/forma/kartochka, ishonch tili
+│   ├── components.css    header, bottom nav, modal, toast, chip, segmented,
+│   │                     360° viewer chrome, stepper, dropzone, pagination
+│   └── components.js     Toast (navbat), Modal (Esc + focus trap),
+│                         guardSubmit, debounce, Theme
+├── styleguide.html       jonli styleguide, mavzu almashtirgichi bilan
+└── screens/
+    ├── catalog.html      mobile-first katalog, filtr sheet, skeleton, empty
+    ├── listing.html      360° viewer, ishonch tili, sticky CTA
+    ├── post.html         ko'p bosqichli forma, majburiy panorama,
+    │                     joy tanlash, AI tavsif oqimi
+    └── error.html        404 va 500
+```
 
-| Yangi ID | Talab | Sabab |
+**Ko'rish:**
+
+```bash
+xdg-open packages/ui/styleguide.html
+xdg-open packages/ui/screens/catalog.html
+```
+
+---
+
+## 11. TZ GA QO'SHILGAN YANGI TALABLAR
+
+Dizayn jarayonida TZ da yo'q, lekin zarur ekani aniqlangan talablar — barchasi
+TZ §6 ga kiritildi:
+
+| ID | Talab | Nima uchun paydo bo'ldi |
 |---|---|---|
-| **NFR-UX-17** | Kontrast **render qilingan sahifada**, eng yomon fonga nisbatan tekshiriladi. CI da avtomatlashtiriladi | Faqat #FFFFFF ga tekshirish 4 ta yiqilishni yashirgan edi |
-| **NFR-UX-18** | Har qanday shrift **kirill alifbosini qo'llashi shart** | Outfit shu sababdan rad etildi; ru — MVP talabi |
-| **NFR-UX-19** | Immersiv sirtlar (360° viewer, xarita) mavzudan qat'i nazar qorong'i | Media o'zi kontent |
-| **NFR-UX-20** | "Tizim hisobladi" va "sotuvchi kiritdi" ma'lumoti vizual jihatdan ajraladi | FR-MAP-09 ning ko'rinadigan ifodasi |
-| **NFR-UX-21** | Ichki standart: matn kontrasti ≥ **5.0** (AA 4.5 + zaxira) | 4.51 da turgan tizim birinchi o'zgarishda yiqiladi |
+| **NFR-UX-17** | Kontrast render qilingan sahifada, eng yomon fonga nisbatan; CI da avtomatlashtiriladi | Faqat #FFFFFF ga tekshirish 4 ta yiqilishni yashirgan edi |
+| **NFR-UX-18** | Shrift kirillni qo'llashi shart | `Outfit` qo'llamaydi, ru esa MVP talabi |
+| **NFR-UX-19** | Immersiv sirtlar mavzudan qat'i nazar qorong'i | 360° viewer va xarita uchun |
+| **NFR-UX-20** | "Tizim hisobladi" ≠ "sotuvchi kiritdi" | FR-MAP-09 ning ko'rinadigan ifodasi |
+| **NFR-UX-21** | Ichki standart ≥ 5.0 (AA 4.5 emas) | 4.51 da turgan tizim birinchi o'zgarishda yiqiladi |
+| **NFR-UX-22** | AI kontenti tasdiqlanmaguncha ajratiladi | AI qatlami (§16) uchinchi ishonch toifasini talab qildi |

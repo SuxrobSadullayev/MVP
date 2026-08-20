@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3DS Home Platform — Ishga tushirish markazi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="packages/ui/src/tokens.css">
+<link rel="stylesheet" href="packages/ui/src/base.css">
+<link rel="stylesheet" href="packages/ui/src/components.css">
+<style>
+  body {
+    padding: var(--space-6) 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .hub-container {
+    max-width: 52rem;
+    margin-inline: auto;
+    padding-inline: var(--space-4);
+  }
+  .hub-header {
+    margin-bottom: var(--space-6);
+    text-align: center;
+  }
+  .hub-grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 40rem) {
+    .hub-grid { grid-template-columns: 1fr 1fr; }
+  }
+  .hub-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-5);
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-divider);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--color-text-primary);
+    transition: transform var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard), border-color var(--duration-fast);
+  }
+  .hub-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-action-bg);
+  }
+  .hub-card-icon {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-3);
+  }
+  .hub-card-title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .hub-card-desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: var(--leading-normal);
+  }
+</style>
+</head>
+<body>
+<main class="hub-container">
+  <div class="hub-header">
+    <div style="display: inline-flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-2)">
+      <span class="brand-mark">3D</span>
+      <h1 class="t-hero" style="font-size: var(--text-3xl); margin: 0">3DS <span style="color: var(--color-text-brand)">HOME</span> MVP</h1>
+    </div>
+    <p class="t-body t-secondary">360° Virtual Tur asosidagi ko'chmas mulk marketplace — UI ekranlari</p>
+  </div>
+
+  <div class="hub-grid">
+    <a class="hub-card" href="packages/ui/screens/catalog.html">
+      <span class="hub-card-icon">🏠</span>
+      <div class="hub-card-title">
+        <span>Katalog ekrani</span>
+        <span class="badge badge-tour">Mobile-First</span>
+      </div>
+      <p class="hub-card-desc">Filtrlar, qidiruv, saralash, e'lon kartochkalari, skeleton loader va bo'sh holat.</p>
+    </a>
+
+    <a class="hub-card" href="packages/ui/screens/listing.html">
+      <span class="hub-card-icon">🌐</span>
+      <div class="hub-card-title">
+        <span>E'lon tafsilotlari & 360°</span>
+        <span class="badge badge-vip">Immersiv</span>
+      </div>
+      <p class="hub-card-desc">360° xona panoramasi, avto-aylanish, OSM infratuzilma (POI) hisoblari va sotuvchi ma'lumotlari.</p>
+    </a>
+
+    <a class="hub-card" href="packages/ui/screens/post.html">
+      <span class="hub-card-icon">➕</span>
+      <div class="hub-card-title">
+        <span>E'lon berish formasi</span>
+        <span class="badge badge-verified">Ko'p bosqichli</span>
+      </div>
+      <p class="hub-card-desc">Xaritadan nuqta tanlash, majburiy 360° panorama va fotosuratlar yuklash maydoni.</p>
+    </a>
+
+    <a class="hub-card" href="packages/ui/screens/error.html">
+      <span class="hub-card-icon">⚠️</span>
+      <div class="hub-card-title">
+        <span>Xato sahifalari</span>
+        <span class="badge badge-neutral">404 / 500</span>
+      </div>
+      <p class="hub-card-desc">Foydalanuvchini to'g'ri yo'naltiruvchi 404 (topilmadi) va 500 (server xatosi) maketlari.</p>
+    </a>
+
+    <a class="hub-card" href="packages/ui/styleguide.html" style="grid-column: 1 / -1">
+      <span class="hub-card-icon">🎨</span>
+      <div class="hub-card-title">
+        <span>Dizayn tizimi & Styleguide</span>
+        <span class="badge badge-success">WCAG 2.1 AA</span>
+      </div>
+      <p class="hub-card-desc">3 qatlamli tokenlar, ranglar kontrasti, tipografiya, 8px grid, tugmalar va barcha holatlar jonli ko'rinishi.</p>
+    </a>
+  </div>
+</main>
+</body>
+</html>

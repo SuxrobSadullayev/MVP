@@ -584,7 +584,16 @@ body[data-scroll-locked] { overflow: hidden; }
   transition: border-color var(--duration-fast) var(--ease-standard);
 }
 .dropzone:hover { border-color: var(--color-action-bg); }
-.dropzone[data-required-missing="true"] { border-color: var(--color-danger-text); background: var(--color-danger-bg); }
+
+/* Xato holati: fon danger-tint ga o'zgaradi, shuning uchun ICHIDAGI barcha matn
+   ham danger rangiga o'tishi kerak. text-muted bu fonda dark'da 3.73 ❌ edi. */
+.dropzone[data-required-missing="true"] {
+  border-color: var(--color-danger-text);
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+.dropzone[data-required-missing="true"] .t-caption,
+.dropzone[data-required-missing="true"] .t-small { color: inherit; }
 
 /* ==========================================================================
    BOSQICHLI INDIKATOR (stepper)
